@@ -1,0 +1,433 @@
+"use client";
+
+import { useEffect, useMemo, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { MotionPathPlugin } from "gsap/MotionPathPlugin";
+import CountUp from "@/components/CountUp";
+import { useLanguage } from "@/components/LanguageProvider";
+
+/**
+ * Global Impact — a dotted world map showing where Emi's marketing work has
+ * landed: Tokyo (semiconductor B2B), Shanghai (native-language market),
+ * Paris (Dassault Systèmes HQ) and San Diego (current base).
+ *
+ * The dot-matrix continents are computed from coarse lat/lon polygons at
+ * build time (deterministic — SSR-safe). Flight arcs draw themselves on
+ * scroll (GSAP ScrollTrigger) and carry a small traveling pulse
+ * (MotionPathPlugin). Stats count up as they enter the viewport.
+ */
+
+/* ── Projection ─────────────────────────────────────────── */
+
+const MAP_W = 760;
+const LAT_TOP = 75;
+const LAT_BOTTOM = -56;
+const SCALE = MAP_W / 360;
+const MAP_H = Math.round((LAT_TOP - LAT_BOTTOM) * SCALE);
+
+const px = (lon: number) => (lon + 180) * SCALE;
+const py = (lat: number) => (LAT_TOP - lat) * SCALE;
+
+/* ── Coarse continent outlines ([lon, lat]) ─────────────
+   Precision only needs to hold up at a 3° dot pitch. */
+
+type Poly = [number, number][];
+
+const CONTINENTS: Poly[] = [
+  // North & Central America
+  [[-166, 65], [-158, 70], [-145, 70], [-130, 70], [-120, 72], [-108, 73], [-96, 72], [-86, 69], [-78, 63], [-70, 60], [-60, 55], [-64, 48], [-70, 44], [-74, 40], [-77, 35], [-80, 31], [-81, 26], [-85, 29], [-91, 29], [-96, 26], [-97, 22], [-94, 17], [-88, 14], [-83, 10], [-79, 8], [-84, 12], [-92, 16], [-100, 19], [-106, 23], [-112, 28], [-117, 33], [-122, 37], [-124, 43], [-124, 48], [-130, 54], [-137, 58], [-146, 60], [-155, 58], [-163, 60]],
+  // Greenland
+  [[-52, 60], [-44, 60], [-38, 65], [-22, 70], [-18, 75], [-25, 80], [-38, 82], [-55, 82], [-65, 78], [-60, 73], [-55, 68]],
+  // South America
+  [[-79, 9], [-72, 12], [-64, 11], [-60, 9], [-52, 4], [-44, -2], [-35, -6], [-35, -10], [-39, -14], [-41, -22], [-48, -26], [-53, -33], [-58, -38], [-62, -40], [-65, -45], [-68, -50], [-69, -54], [-72, -52], [-73, -45], [-71, -37], [-71, -30], [-70, -22], [-70, -18], [-75, -14], [-79, -7], [-81, -3], [-80, 3]],
+  // Africa
+  [[-17, 15], [-16, 20], [-12, 26], [-7, 32], [-2, 35], [5, 36], [11, 34], [19, 32], [29, 31], [33, 30], [35, 24], [37, 18], [43, 11], [48, 11], [51, 12], [47, 4], [41, -3], [39, -10], [35, -18], [33, -24], [28, -32], [22, -34], [18, -33], [15, -27], [12, -19], [10, -10], [8, -2], [6, 4], [0, 6], [-8, 5], [-13, 9]],
+  // Eurasia (Iberia → Scandinavia → Siberia → SE Asia → India → Arabia → Mediterranean)
+  [[-9, 37], [-9, 43], [-2, 44], [-1, 47], [-5, 48], [-2, 50], [3, 53], [8, 55], [8, 58], [5, 60], [10, 64], [16, 69], [25, 71], [35, 69], [45, 68], [55, 70], [68, 72], [80, 73], [95, 75], [110, 74], [125, 73], [140, 72], [155, 70], [168, 68], [178, 66], [172, 62], [163, 58], [158, 53], [148, 52], [142, 53], [135, 47], [132, 43], [129, 38], [126, 35], [122, 37], [120, 32], [122, 28], [115, 22], [108, 17], [109, 12], [105, 9], [100, 8], [103, 2], [100, 6], [98, 12], [96, 17], [92, 21], [88, 22], [86, 20], [83, 17], [80, 13], [78, 8], [76, 10], [73, 17], [70, 21], [67, 24], [62, 25], [57, 26], [56, 27], [58, 23], [55, 17], [52, 15], [48, 14], [43, 12], [43, 17], [40, 20], [37, 24], [35, 28], [34, 30], [36, 36], [30, 36], [27, 37], [22, 37], [19, 40], [15, 41], [12, 44], [10, 44], [8, 44], [5, 43], [3, 42], [0, 40], [-2, 37], [-6, 36]],
+  // Australia
+  [[114, -22], [122, -18], [130, -12], [137, -12], [142, -11], [146, -15], [149, -20], [153, -27], [150, -35], [145, -38], [140, -38], [135, -35], [129, -32], [124, -33], [115, -34], [113, -26]],
+];
+
+// Islands too small for polygons at this pitch — placed as individual dots.
+const ISLAND_DOTS: [number, number][] = [
+  // Japan
+  [130, 32], [131, 33], [133, 34], [135, 34.5], [137, 35], [139, 35.5], [140, 37], [141, 39], [140.5, 41], [141, 43], [143, 43.5], [142.5, 45],
+  // British Isles
+  [-4, 51], [-2, 52], [-1, 53.5], [-3, 55], [-4, 57], [-8, 53.5],
+  // Iceland
+  [-19, 65], [-16, 64.5],
+  // Indonesia & New Guinea
+  [101, 0], [103, -2], [106, -6], [110, -7], [113, -7.5], [117, -8.5], [120, -9], [110, 0.5], [113, 1.5], [116, 3.5], [121, -2], [128, -3], [136, -4], [140, -5], [144, -6], [147, -7],
+  // Philippines
+  [121, 16], [122, 13], [124, 11], [125, 8],
+  // Taiwan · Hainan · Sri Lanka
+  [121, 24], [110, 19], [81, 7],
+  // Madagascar
+  [46, -16], [47, -19], [46, -22], [44.5, -24],
+  // Caribbean
+  [-80, 22], [-77, 21], [-71, 19], [-66, 18],
+  // New Zealand
+  [174, -36.5], [175.5, -38.5], [172.5, -42], [169, -45],
+];
+
+function insidePoly(lon: number, lat: number, poly: Poly) {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i];
+    const [xj, yj] = poly[j];
+    if (yi > lat !== yj > lat && lon < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) {
+      inside = !inside;
+    }
+  }
+  return inside;
+}
+
+/* ── Cities & arcs ──────────────────────────────────────── */
+
+const CITIES: Record<string, { lon: number; lat: number }> = {
+  sandiego: { lon: -117.16, lat: 32.72 },
+  tokyo: { lon: 139.69, lat: 35.68 },
+  shanghai: { lon: 121.47, lat: 31.23 },
+  paris: { lon: 2.35, lat: 48.86 },
+};
+
+// Per-city label nudges so pills near the map edge (Tokyo) or near each
+// other (Tokyo/Shanghai) don't clip or collide. Default is centered above.
+const LABEL_TRANSFORM: Record<string, string> = {
+  tokyo: "translate(-88%, -175%)",
+  shanghai: "translate(-50%, 80%)",
+};
+
+const ARCS: [string, string][] = [
+  ["tokyo", "sandiego"],
+  ["tokyo", "shanghai"],
+  ["tokyo", "paris"],
+  ["sandiego", "paris"],
+];
+
+/* ── Trilingual copy ────────────────────────────────────── */
+
+type Lang = "en" | "ja" | "zh";
+
+interface ImpactCopy {
+  kicker: string;
+  kickerJp: string;
+  title: string;
+  subtitle: string;
+  stats: { value: number; prefix?: string; suffix?: string; label: string }[];
+  locations: { id: string; flag: string; city: string; country: string; role: string }[];
+}
+
+const COPY: Record<Lang, ImpactCopy> = {
+  en: {
+    kicker: "Global Impact",
+    kickerJp: "世界での実績",
+    title: "Marketing without borders.",
+    subtitle:
+      "Campaigns planned in Tokyo, localized for Shanghai, scaled across Europe — and led today from San Diego.",
+    stats: [
+      { value: 140, prefix: "+", suffix: "%", label: "Revenue growth led from Tokyo" },
+      { value: 7, suffix: "+", label: "Years in global B2B marketing" },
+      { value: 4, label: "Working languages" },
+      { value: 3, label: "Continents of campaign delivery" },
+    ],
+    locations: [
+      { id: "sandiego", flag: "🇺🇸", city: "San Diego", country: "United States", role: "Home base — MBA at UC San Diego, marketing at Dassault Systèmes BIOVIA" },
+      { id: "tokyo", flag: "🇯🇵", city: "Tokyo", country: "Japan", role: "6+ years leading global B2B semiconductor marketing & GTM strategy" },
+      { id: "shanghai", flag: "🇨🇳", city: "Shanghai", country: "China", role: "Native-fluency market — campaigns in Mandarin & Shanghainese" },
+      { id: "paris", flag: "🇫🇷", city: "Paris", country: "France", role: "Dassault Systèmes HQ — global SaaS campaigns across EU markets" },
+    ],
+  },
+  ja: {
+    kicker: "Global Impact",
+    kickerJp: "世界での実績",
+    title: "国境を越えるマーケティング。",
+    subtitle:
+      "東京で立案し、上海へローカライズ、欧州へスケール。現在はサンディエゴから世界のキャンペーンを指揮。",
+    stats: [
+      { value: 140, prefix: "+", suffix: "%", label: "東京から牽引した売上成長" },
+      { value: 7, suffix: "+", label: "グローバルB2Bマーケティング歴（年）" },
+      { value: 4, label: "ビジネスで使う言語" },
+      { value: 3, label: "キャンペーンを展開した大陸" },
+    ],
+    locations: [
+      { id: "sandiego", flag: "🇺🇸", city: "サンディエゴ", country: "アメリカ", role: "現在の拠点 — UCサンディエゴMBA在学、ダッソー・システムズBIOVIAでマーケティング" },
+      { id: "tokyo", flag: "🇯🇵", city: "東京", country: "日本", role: "半導体グローバルB2BマーケティングとGTM戦略を6年以上リード" },
+      { id: "shanghai", flag: "🇨🇳", city: "上海", country: "中国", role: "ネイティブ市場 — 中国語・上海語でのキャンペーン展開" },
+      { id: "paris", flag: "🇫🇷", city: "パリ", country: "フランス", role: "ダッソー・システムズ本社 — 欧州市場向けグローバルSaaSキャンペーン" },
+    ],
+  },
+  zh: {
+    kicker: "Global Impact",
+    kickerJp: "全球影响力",
+    title: "跨越国界的营销。",
+    subtitle:
+      "在东京策划，在上海本地化，在欧洲扩展——如今在圣地亚哥主导全球营销。",
+    stats: [
+      { value: 140, prefix: "+", suffix: "%", label: "从东京推动的营收增长" },
+      { value: 7, suffix: "+", label: "全球B2B营销经验（年）" },
+      { value: 4, label: "工作语言" },
+      { value: 3, label: "营销覆盖的大洲" },
+    ],
+    locations: [
+      { id: "sandiego", flag: "🇺🇸", city: "圣地亚哥", country: "美国", role: "现居地 — 加州大学圣地亚哥分校MBA在读，就职于达索系统BIOVIA" },
+      { id: "tokyo", flag: "🇯🇵", city: "东京", country: "日本", role: "领导半导体全球B2B营销与市场进入战略6年以上" },
+      { id: "shanghai", flag: "🇨🇳", city: "上海", country: "中国", role: "母语市场 — 以中文与上海话开展营销活动" },
+      { id: "paris", flag: "🇫🇷", city: "巴黎", country: "法国", role: "达索系统总部 — 面向欧洲市场的全球SaaS营销" },
+    ],
+  },
+};
+
+/* ── Component ──────────────────────────────────────────── */
+
+export default function GlobalImpactMap() {
+  const { lang } = useLanguage();
+  const copy = COPY[lang];
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Deterministic — identical on server and client, so no hydration drift.
+  const dots = useMemo(() => {
+    const out: { x: number; y: number }[] = [];
+    for (let lat = 73.5; lat >= LAT_BOTTOM + 1.5; lat -= 3) {
+      for (let lon = -177; lon <= 177; lon += 3) {
+        if (CONTINENTS.some((p) => insidePoly(lon, lat, p))) {
+          out.push({ x: px(lon), y: py(lat) });
+        }
+      }
+    }
+    for (const [lon, lat] of ISLAND_DOTS) {
+      out.push({ x: px(lon), y: py(lat) });
+    }
+    return out;
+  }, []);
+
+  const cityPx = useMemo(() => {
+    const m: Record<string, { x: number; y: number }> = {};
+    for (const [id, { lon, lat }] of Object.entries(CITIES)) {
+      m[id] = { x: px(lon), y: py(lat) };
+    }
+    return m;
+  }, []);
+
+  const arcPaths = useMemo(
+    () =>
+      ARCS.map(([from, to]) => {
+        const a = cityPx[from];
+        const b = cityPx[to];
+        // Quadratic arc lifted above the endpoints, clamped inside the viewBox.
+        const lift = Math.min(70, Math.max(22, Math.abs(b.x - a.x) * 0.18));
+        const cx = (a.x + b.x) / 2;
+        const cy = Math.min(a.y, b.y) - lift;
+        return `M ${a.x.toFixed(1)} ${a.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+      }),
+    [cityPx]
+  );
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const ctx = gsap.context(() => {
+      const arcs = gsap.utils.toArray<SVGPathElement>(".impact-arc");
+      const pulses = gsap.utils.toArray<SVGCircleElement>(".impact-pulse");
+      const markers = gsap.utils.toArray<SVGGElement>(".impact-marker");
+
+      if (reduced) {
+        gsap.set("[data-map-reveal]", { opacity: 1 });
+        gsap.set(pulses, { opacity: 0 });
+        return;
+      }
+
+      gsap.set(markers, { scale: 0, transformOrigin: "50% 50%" });
+      arcs.forEach((path) => {
+        const len = path.getTotalLength();
+        gsap.set(path, { strokeDasharray: len, strokeDashoffset: len });
+      });
+      gsap.set(pulses, { opacity: 0 });
+
+      const startPulses = () => {
+        pulses.forEach((pulse, i) => {
+          gsap.set(pulse, { opacity: 0.9 });
+          gsap.to(pulse, {
+            motionPath: { path: arcs[i], align: arcs[i], alignOrigin: [0.5, 0.5] },
+            duration: 4.5 + i * 1.2,
+            repeat: -1,
+            ease: "none",
+            delay: i * 1.1,
+          });
+        });
+      };
+
+      gsap
+        .timeline({
+          scrollTrigger: { trigger: sectionRef.current, start: "top 72%", once: true },
+          defaults: { ease: "power3.out" },
+        })
+        .fromTo(
+          "[data-map-reveal]",
+          { opacity: 0, y: 26 },
+          { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, clearProps: "transform" },
+          0
+        )
+        .fromTo(
+          ".impact-dots",
+          { opacity: 0, scale: 0.985, transformOrigin: "50% 50%" },
+          { opacity: 1, scale: 1, duration: 1.1 },
+          0.15
+        )
+        .to(arcs, { strokeDashoffset: 0, duration: 1.5, ease: "power2.inOut", stagger: 0.18 }, 0.55)
+        .to(
+          markers,
+          { scale: 1, duration: 0.55, ease: "back.out(2.2)", stagger: 0.12 },
+          0.8
+        )
+        .add(startPulses, 2.1);
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section ref={sectionRef} id="global-impact" className="relative overflow-hidden py-16 sm:py-24">
+      {/* Seigaiha wave texture, fading upward */}
+      <div
+        aria-hidden="true"
+        className="seigaiha pointer-events-none absolute inset-x-0 bottom-0 h-56 opacity-[0.07] dark:opacity-[0.12]"
+        style={{ maskImage: "linear-gradient(to top, #000, transparent)", WebkitMaskImage: "linear-gradient(to top, #000, transparent)" }}
+      />
+      {/* Vertical kanji watermark */}
+      <div
+        aria-hidden="true"
+        className="vertical-rl font-display pointer-events-none absolute right-3 top-10 select-none text-7xl font-bold text-[var(--color-foreground)] opacity-[0.045] sm:right-8 sm:text-8xl"
+      >
+        世界へ
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-5xl px-6">
+        {/* Heading */}
+        <div className="mb-10 max-w-2xl" data-map-reveal>
+          <p className="mb-3 flex items-center gap-2.5 text-sm font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]">
+            {/* Hinomaru dot */}
+            <span aria-hidden="true" className="inline-block h-2.5 w-2.5 rounded-full bg-[var(--color-hanko)]" />
+            {copy.kicker}
+            <span className="font-normal normal-case tracking-widest text-[var(--color-muted)]">
+              {copy.kickerJp}
+            </span>
+          </p>
+          <h2 className="font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl">
+            {copy.title}
+          </h2>
+          <p className="mt-4 text-base leading-relaxed text-[var(--color-muted)] sm:text-lg">
+            {copy.subtitle}
+          </p>
+        </div>
+
+        {/* Map */}
+        <div className="relative" data-map-reveal>
+          <svg
+            viewBox={`0 0 ${MAP_W} ${MAP_H}`}
+            className="h-auto w-full"
+            role="img"
+            aria-label={copy.title}
+          >
+            <defs>
+              <linearGradient id="impact-arc-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="var(--color-accent)" />
+                <stop offset="100%" stopColor="var(--color-sakura)" />
+              </linearGradient>
+            </defs>
+
+            {/* Dotted continents */}
+            <g className="impact-dots" fill="var(--color-muted)" opacity="0.9">
+              {dots.map((d, i) => (
+                <circle key={i} cx={d.x.toFixed(1)} cy={d.y.toFixed(1)} r="1.9" opacity="0.32" />
+              ))}
+            </g>
+
+            {/* Flight arcs */}
+            <g fill="none" stroke="url(#impact-arc-grad)" strokeWidth="1.6" strokeLinecap="round">
+              {arcPaths.map((d, i) => (
+                <path key={i} d={d} className="impact-arc" opacity="0.75" />
+              ))}
+            </g>
+
+            {/* Traveling pulses along the arcs */}
+            {arcPaths.map((_, i) => (
+              <circle key={i} className="impact-pulse" r="2.4" fill="var(--color-sakura)" opacity="0" />
+            ))}
+
+            {/* City markers */}
+            {copy.locations.map((loc) => {
+              const p = cityPx[loc.id];
+              return (
+                <g key={loc.id} className="impact-marker">
+                  <circle cx={p.x} cy={p.y} r="8" fill="var(--color-accent)" opacity="0.14" />
+                  <circle cx={p.x} cy={p.y} r="8" fill="none" stroke="var(--color-accent)" strokeWidth="1" opacity="0.5" className="map-ping" />
+                  <circle cx={p.x} cy={p.y} r="3.2" fill="var(--color-accent)" stroke="var(--color-background)" strokeWidth="1.4" />
+                </g>
+              );
+            })}
+          </svg>
+
+          {/* City name pills (HTML, % positioned over the SVG) */}
+          {copy.locations.map((loc) => {
+            const p = cityPx[loc.id];
+            return (
+              <span
+                key={loc.id}
+                className="map-city-label"
+                style={{
+                  left: `${(p.x / MAP_W) * 100}%`,
+                  top: `${(p.y / MAP_H) * 100}%`,
+                  transform: LABEL_TRANSFORM[loc.id],
+                }}
+              >
+                {loc.city}
+              </span>
+            );
+          })}
+        </div>
+
+        {/* Stats */}
+        <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4" data-map-reveal>
+          {copy.stats.map((stat) => (
+            <div key={stat.label} className="glass-card glass-card-hover px-5 py-6 text-center">
+              <div className="font-display text-3xl font-bold tabular-nums text-[var(--color-accent)] sm:text-4xl">
+                <CountUp
+                  end={stat.value}
+                  prefix={stat.prefix ?? ""}
+                  suffix={stat.suffix ?? ""}
+                  durationMs={1600}
+                />
+              </div>
+              <div className="mt-2 text-xs font-medium leading-snug text-[var(--color-muted)] sm:text-sm">
+                {stat.label}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Location detail cards */}
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 sm:gap-4" data-map-reveal>
+          {copy.locations.map((loc) => (
+            <div key={loc.id} className="glass-card glass-card-hover flex items-start gap-3.5 px-5 py-4">
+              <span aria-hidden="true" className="mt-0.5 text-xl leading-none">
+                {loc.flag}
+              </span>
+              <div>
+                <div className="text-sm font-semibold">
+                  {loc.city}
+                  <span className="ml-2 text-xs font-normal text-[var(--color-muted)]">{loc.country}</span>
+                </div>
+                <p className="mt-1 text-xs leading-relaxed text-[var(--color-muted)] sm:text-[0.8rem]">
+                  {loc.role}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
