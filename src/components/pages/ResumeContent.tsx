@@ -1,10 +1,12 @@
 "use client";
 
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import { getUI, getProfile } from "@/lib/translations";
 import { useReveal } from "@/lib/useReveal";
 import SideNav from "@/components/SideNav";
 import Link from "next/link";
+import ProjectCard from "@/components/ProjectCard";
 import SectionHeading from "@/components/shared/SectionHeading";
 import CertificationCard from "@/components/shared/CertificationCard";
 import EducationCard from "@/components/shared/EducationCard";
@@ -21,6 +23,38 @@ export default function ResumeContent() {
   const skillsRef = useReveal();
   const certsRef = useReveal();
   const langRef = useReveal();
+
+  // ── Projects carousel state (moved from the home page) ──
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const updateScrollState = useCallback(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  }, []);
+
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    updateScrollState();
+    el.addEventListener("scroll", updateScrollState, { passive: true });
+    window.addEventListener("resize", updateScrollState);
+    return () => {
+      el.removeEventListener("scroll", updateScrollState);
+      window.removeEventListener("resize", updateScrollState);
+    };
+  }, [updateScrollState]);
+
+  const scrollCarousel = (dir: "left" | "right") => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const firstCard = el.querySelector<HTMLElement>("[data-carousel-card]");
+    const step = firstCard ? firstCard.offsetWidth + 24 : el.clientWidth * 0.8;
+    el.scrollBy({ left: dir === "left" ? -step : step, behavior: "smooth" });
+  };
 
   return (
     <section className="py-16 print:py-0">
@@ -149,38 +183,60 @@ export default function ResumeContent() {
           ref={projRef.ref}
           className={`mb-10 scroll-mt-20 reveal ${projRef.revealed ? "revealed" : ""}`}
         >
-          <SectionHeading>{ui.home.featuredProjects}</SectionHeading>
-          <div className="space-y-4">
-            {profile.projects.slice(0, 3).map((project) => (
-              <div
-                key={project.id}
-                className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-sm transition-all duration-200 hover:border-[var(--color-accent)]/20 hover:shadow-md print:border-0 print:p-0 print:shadow-none"
-              >
-                <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between">
-                  <h3 className="text-sm font-bold">{project.title}</h3>
-                  <span className="rounded-full bg-[var(--color-accent-light)] px-2.5 py-0.5 text-[11px] font-medium text-[var(--color-accent)] shrink-0 print:bg-transparent print:px-0">
-                    {project.dates}
-                  </span>
-                </div>
-                <p className="mt-1 text-xs leading-relaxed text-[var(--color-muted)] line-clamp-2">
-                  {project.summary}
-                </p>
-                <Link
-                  href={`/projects#${project.id}`}
-                  className="mt-2 inline-block text-xs font-semibold text-[var(--color-accent)] hover:underline"
+          <div className="mb-4 flex items-end justify-between gap-4">
+            <SectionHeading className="mb-0">{ui.home.featuredProjects}</SectionHeading>
+            <div className="flex items-center gap-3 print:hidden">
+              <div className="hidden gap-2 sm:flex">
+                <button
+                  type="button"
+                  onClick={() => scrollCarousel("left")}
+                  disabled={!canScrollLeft}
+                  aria-label="Previous projects"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-foreground)] shadow-sm transition-all duration-200 hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-accent-light)] hover:text-[var(--color-accent)] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-[var(--color-border)] disabled:hover:bg-[var(--color-card)] disabled:hover:text-[var(--color-foreground)] disabled:hover:shadow-sm focus-ring"
                 >
-                  Read more →
-                </Link>
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollCarousel("right")}
+                  disabled={!canScrollRight}
+                  aria-label="Next projects"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-foreground)] shadow-sm transition-all duration-200 hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-accent-light)] hover:text-[var(--color-accent)] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-[var(--color-border)] disabled:hover:bg-[var(--color-card)] disabled:hover:text-[var(--color-foreground)] disabled:hover:shadow-sm focus-ring"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
               </div>
-            ))}
+              <Link
+                href="/projects"
+                className="group flex items-center gap-1 text-sm font-medium text-[var(--color-accent)] transition-colors hover:text-[var(--color-accent-hover)] focus-ring"
+              >
+                {ui.common.viewAll}
+                <svg className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+            </div>
           </div>
-          <div className="mt-4 text-center">
-            <Link
-              href="/projects"
-              className="inline-flex items-center gap-1 text-xs font-medium text-[var(--color-accent)] transition-colors hover:underline"
+          {/* Snap-scroll carousel (moved from the home page) */}
+          <div className="relative -mx-6 print:mx-0">
+            <div
+              ref={carouselRef}
+              className="carousel-scroll flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-6 py-4 print:grid print:grid-cols-1 print:gap-4 print:overflow-visible print:px-0"
             >
-              {ui.common.viewAll} →
-            </Link>
+              {profile.projects.map((project) => (
+                <div
+                  key={project.id}
+                  data-carousel-card
+                  className="flex w-[300px] shrink-0 snap-start print:w-full"
+                >
+                  <ProjectCard project={project} featured compact />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
