@@ -4,6 +4,8 @@ import { useState, useMemo } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import { getUI, getProfile } from "@/lib/translations";
 import ProjectCard from "@/components/ProjectCard";
+import PageBackdrop from "@/components/PageBackdrop";
+import CustomCursor from "@/components/CustomCursor";
 
 export default function ProjectsPage() {
   const { lang } = useLanguage();
@@ -23,8 +25,10 @@ export default function ProjectsPage() {
     : profile.projects;
 
   return (
-    <section className="py-20">
-      <div className="mx-auto max-w-5xl px-6">
+    <section className="relative overflow-hidden py-20">
+      <CustomCursor />
+      <PageBackdrop />
+      <div className="relative z-10 mx-auto max-w-5xl px-6">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">{ui.projects.title}</h1>
           <p className="mt-2 text-[var(--color-muted)]">

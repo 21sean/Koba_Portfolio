@@ -11,6 +11,8 @@ import SectionHeading from "@/components/shared/SectionHeading";
 import CertificationCard from "@/components/shared/CertificationCard";
 import EducationCard from "@/components/shared/EducationCard";
 import ExperienceCard from "@/components/shared/ExperienceCard";
+import PageBackdrop from "@/components/PageBackdrop";
+import CustomCursor from "@/components/CustomCursor";
 
 export default function ResumeContent() {
   const { lang } = useLanguage();
@@ -57,7 +59,9 @@ export default function ResumeContent() {
   };
 
   return (
-    <section className="py-16 print:py-0">
+    <section className="relative overflow-hidden py-16 print:overflow-visible print:py-0">
+      <CustomCursor />
+      <PageBackdrop />
       <SideNav
         items={[
           { id: "resume-summary", label: ui.resume.summary },
@@ -69,7 +73,7 @@ export default function ResumeContent() {
           { id: "resume-skills", label: ui.resume.skills },
         ]}
       />
-      <div className="mx-auto max-w-3xl px-6 print:max-w-none print:px-8">
+      <div className="relative z-10 mx-auto max-w-3xl px-6 print:max-w-none print:px-8">
         {/* ── Header ────────────────────────────── */}
         <header className="mb-10 flex items-center gap-6 border-b border-[var(--color-border)] pb-8">
           <div className="flex-1 min-w-0">
@@ -128,7 +132,7 @@ export default function ResumeContent() {
               >
                 <span className="font-bold">{lng.name}</span>{" "}
                 <span className="text-[var(--color-muted)]">
-                  — {lng.proficiency}
+                  · {lng.proficiency}
                 </span>
               </div>
             ))}
