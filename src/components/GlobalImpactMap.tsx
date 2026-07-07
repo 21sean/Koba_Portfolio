@@ -129,7 +129,7 @@ const COPY: Record<Lang, ImpactCopy> = {
     kickerJp: "世界での実績",
     title: "Marketing without borders.",
     subtitle:
-      "Campaigns planned in Tokyo, localized for Shanghai, scaled across Europe — and led today from San Diego.",
+      "Campaigns planned in Tokyo, localized for Shanghai, scaled across Europe, and led today from San Diego.",
     hint: "Hover a marker to see the market",
     stats: [
       { value: 140, prefix: "+", suffix: "%", label: "Revenue growth led from Tokyo" },
@@ -137,10 +137,10 @@ const COPY: Record<Lang, ImpactCopy> = {
       { value: 4, label: "Working languages" },
     ],
     locations: [
-      { id: "sandiego", flag: "🇺🇸", country: "United States", role: "Home base — MBA at UC San Diego, marketing at Dassault Systèmes BIOVIA" },
-      { id: "tokyo", flag: "🇯🇵", country: "Japan", role: "6+ years leading global B2B semiconductor marketing & GTM strategy" },
-      { id: "shanghai", flag: "🇨🇳", country: "China", role: "Native-fluency market — campaigns in Mandarin & Shanghainese" },
-      { id: "paris", flag: "🇪🇺", country: "Europe", role: "Dassault Systèmes HQ — global SaaS campaigns across EU markets" },
+      { id: "sandiego", flag: "🇺🇸", country: "United States", role: "Home base: MBA at UC San Diego, marketing at Dassault Systèmes BIOVIA" },
+      { id: "tokyo", flag: "🇯🇵", country: "Japan", role: "Moretec Group: 6+ years leading global B2B semiconductor marketing & GTM strategy, driving +140% revenue growth" },
+      { id: "shanghai", flag: "🇨🇳", country: "China", role: "Native-fluency market: campaigns in Mandarin & Shanghainese" },
+      { id: "paris", flag: "🇪🇺", country: "Europe", role: "Dassault Systèmes HQ: global SaaS campaigns across EU markets" },
     ],
   },
   ja: {
@@ -156,10 +156,10 @@ const COPY: Record<Lang, ImpactCopy> = {
       { value: 4, label: "ビジネスで使う言語" },
     ],
     locations: [
-      { id: "sandiego", flag: "🇺🇸", country: "アメリカ", role: "現在の拠点 — UCサンディエゴMBA在学、ダッソー・システムズBIOVIAでマーケティング" },
-      { id: "tokyo", flag: "🇯🇵", country: "日本", role: "半導体グローバルB2BマーケティングとGTM戦略を6年以上リード" },
-      { id: "shanghai", flag: "🇨🇳", country: "中国", role: "ネイティブ市場 — 中国語・上海語でのキャンペーン展開" },
-      { id: "paris", flag: "🇪🇺", country: "ヨーロッパ", role: "ダッソー・システムズ本社 — 欧州市場向けグローバルSaaSキャンペーン" },
+      { id: "sandiego", flag: "🇺🇸", country: "アメリカ", role: "現在の拠点：UCサンディエゴMBA在学、ダッソー・システムズBIOVIAでマーケティング" },
+      { id: "tokyo", flag: "🇯🇵", country: "日本", role: "Moretec Group：半導体グローバルB2BマーケティングとGTM戦略を6年以上リードし、売上140%成長を牽引" },
+      { id: "shanghai", flag: "🇨🇳", country: "中国", role: "ネイティブ市場：中国語・上海語でのキャンペーン展開" },
+      { id: "paris", flag: "🇪🇺", country: "ヨーロッパ", role: "ダッソー・システムズ本社：欧州市場向けグローバルSaaSキャンペーン" },
     ],
   },
   zh: {
@@ -167,7 +167,7 @@ const COPY: Record<Lang, ImpactCopy> = {
     kickerJp: "全球影响力",
     title: "跨越国界的营销。",
     subtitle:
-      "在东京策划，在上海本地化，在欧洲扩展——如今在圣地亚哥主导全球营销。",
+      "在东京策划，在上海本地化，在欧洲扩展，如今在圣地亚哥主导全球营销。",
     hint: "将光标悬停在标记上即可查看市场",
     stats: [
       { value: 140, prefix: "+", suffix: "%", label: "从东京推动的营收增长" },
@@ -175,10 +175,10 @@ const COPY: Record<Lang, ImpactCopy> = {
       { value: 4, label: "工作语言" },
     ],
     locations: [
-      { id: "sandiego", flag: "🇺🇸", country: "美国", role: "现居地 — 加州大学圣地亚哥分校MBA在读，就职于达索系统BIOVIA" },
-      { id: "tokyo", flag: "🇯🇵", country: "日本", role: "领导半导体全球B2B营销与市场进入战略6年以上" },
-      { id: "shanghai", flag: "🇨🇳", country: "中国", role: "母语市场 — 以中文与上海话开展营销活动" },
-      { id: "paris", flag: "🇪🇺", country: "欧洲", role: "达索系统总部 — 面向欧洲市场的全球SaaS营销" },
+      { id: "sandiego", flag: "🇺🇸", country: "美国", role: "现居地：加州大学圣地亚哥分校MBA在读，就职于达索系统BIOVIA" },
+      { id: "tokyo", flag: "🇯🇵", country: "日本", role: "Moretec Group：领导半导体全球B2B营销与市场进入战略6年以上，推动营收增长140%" },
+      { id: "shanghai", flag: "🇨🇳", country: "中国", role: "母语市场：以中文与上海话开展营销活动" },
+      { id: "paris", flag: "🇪🇺", country: "欧洲", role: "达索系统总部：面向欧洲市场的全球SaaS营销" },
     ],
   },
 };
