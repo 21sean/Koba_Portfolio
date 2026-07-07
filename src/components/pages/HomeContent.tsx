@@ -1,6 +1,9 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { assetPath } from "@/lib/basePath";
 import { useLanguage } from "@/components/LanguageProvider";
 import { getUI, getProfile } from "@/lib/translations";
@@ -8,6 +11,10 @@ import Skills from "@/components/Skills";
 import CountUp from "@/components/CountUp";
 import SkyScene from "@/components/SkyScene";
 import SakuraPetals from "@/components/SakuraPetals";
+import SakuraBlossom from "@/components/SakuraBlossom";
+import CustomCursor from "@/components/CustomCursor";
+import Magnetic from "@/components/Magnetic";
+import GlobalImpactMap from "@/components/GlobalImpactMap";
 import { useMounted, useReveal } from "@/lib/useReveal";
 
 // Hero headline: single quantifiable sentence with one inline animated number.
@@ -73,6 +80,28 @@ const FLIP_PHRASES: Record<"en" | "ja" | "zh", { prefix: string; words: string[]
   },
 };
 
+// Vertical tategaki tagline beside the hero (decorative, kept in Japanese
+// across languages — part of the site's visual identity).
+const VERTICAL_TAGLINE = "世界を動かすマーケティング";
+
+// Name rendered per-character so GSAP can stagger the letters rising out of
+// overflow-hidden word wrappers.
+function SplitChars({ text }: { text: string }) {
+  return (
+    <>
+      {text.split(" ").map((word, wi) => (
+        <span key={wi} data-hero-line className="mr-[0.28em] last:mr-0">
+          {word.split("").map((ch, ci) => (
+            <span key={ci} data-hero-char>
+              {ch}
+            </span>
+          ))}
+        </span>
+      ))}
+    </>
+  );
+}
+
 export default function HomeContent() {
   const { lang } = useLanguage();
   const ui = getUI(lang);
@@ -82,11 +111,74 @@ export default function HomeContent() {
   const headline = HERO_HEADLINE[lang];
 
   const ctaRef = useReveal();
+  const heroRef = useRef<HTMLElement>(null);
+  const fujiRef = useRef<HTMLDivElement>(null);
+
+  // Hero intro timeline + Fuji parallax.
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) return; // CSS reduced-motion overrides reveal everything.
+
+    const ctx = gsap.context(() => {
+      gsap
+        .timeline({ defaults: { ease: "power3.out" } })
+        .to(
+          "[data-hero-char]",
+          { y: 0, duration: 0.9, stagger: 0.035, ease: "power4.out" },
+          0.15
+        )
+        .fromTo(
+          "[data-hero]",
+          { opacity: 0, y: 26 },
+          { opacity: 1, y: 0, duration: 0.85, stagger: 0.09, clearProps: "transform" },
+          0.4
+        );
+
+      // Mt Fuji drifts down slower than the page scroll.
+      if (fujiRef.current) {
+        gsap.to(fujiRef.current, {
+          yPercent: 14,
+          ease: "none",
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+      }
+    }, heroRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  // Gentle mouse parallax on the Fuji art layer (desktop only).
+  useEffect(() => {
+    const hero = heroRef.current;
+    const fuji = fujiRef.current;
+    if (!hero || !fuji) return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const toX = gsap.quickTo(fuji, "x", { duration: 0.8, ease: "power3.out" });
+    const onMove = (e: PointerEvent) => {
+      const r = hero.getBoundingClientRect();
+      toX(((e.clientX - r.left) / r.width - 0.5) * -14);
+    };
+    hero.addEventListener("pointermove", onMove, { passive: true });
+    return () => {
+      hero.removeEventListener("pointermove", onMove);
+      gsap.killTweensOf(fuji, "x");
+    };
+  }, []);
 
   return (
     <>
+      <CustomCursor />
+
       {/* ── Hero ──────────────────────────────── */}
-      <section className="relative overflow-hidden py-12 lg:py-16">
+      <section ref={heroRef} className="relative overflow-hidden py-12 lg:py-16">
         {/* Subtle background gradient */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-[var(--color-accent)]/5 blur-3xl" />
@@ -98,6 +190,7 @@ export default function HomeContent() {
             sakura — mirroring the Contact page backdrop. */}
         <SkyScene celestial={false} />
         <div
+          ref={fujiRef}
           aria-hidden="true"
           className="pointer-events-none absolute -right-8 top-20 z-0 w-[68%] max-w-2xl select-none sm:right-0 sm:top-24 sm:w-[54%]"
         >
@@ -129,16 +222,45 @@ export default function HomeContent() {
         <SakuraPetals count={12} />
 
         <div className="relative z-10 mx-auto max-w-5xl px-6">
+          {/* Giant kanji watermark — 惠 (Megumi, "blessing"), from 惠美 */}
+          <div
+            aria-hidden="true"
+            className="font-display pointer-events-none absolute -left-10 -top-8 select-none text-[15rem] font-bold leading-none text-[var(--color-foreground)] opacity-[0.04] dark:opacity-[0.06] sm:-top-12 sm:text-[19rem]"
+          >
+            惠
+          </div>
+
+          {/* Vertical tategaki tagline (wide screens only) */}
+          <div
+            aria-hidden="true"
+            data-hero
+            className="vertical-rl font-display absolute -left-12 top-4 hidden text-xs font-semibold tracking-[0.5em] text-[var(--color-muted)]/70 xl:block"
+          >
+            {VERTICAL_TAGLINE}
+          </div>
+
           <div className="flex flex-col-reverse items-start gap-10 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex-1">
-              <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]">
+              <p
+                data-hero
+                className="mb-4 flex items-center gap-2.5 text-sm font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]"
+              >
+                {/* Hinomaru dot */}
+                <span aria-hidden="true" className="inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--color-hanko)]" />
                 {profile.location}
               </p>
-              <h1 className="max-w-3xl text-4xl font-extrabold leading-[1.1] tracking-tight lg:text-6xl">
-                {profile.name}
+              <h1 className="font-display max-w-3xl text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl lg:text-7xl">
+                <SplitChars text={profile.name} />
               </h1>
+              <p
+                data-hero
+                className="font-display mt-3 text-base font-semibold tracking-[0.35em] text-[var(--color-muted)]"
+              >
+                小林惠美
+              </p>
+
               {/* Quantifiable headline with one inline animated number */}
-              <p className="mt-5 max-w-2xl text-xl leading-relaxed text-[var(--color-foreground)] lg:text-2xl font-medium">
+              <p data-hero className="mt-5 max-w-2xl text-xl font-medium leading-relaxed text-[var(--color-foreground)] lg:text-2xl">
                 {headline.before}
                 <span className="font-extrabold text-[var(--color-accent)] tabular-nums">
                   {mounted ? (
@@ -158,7 +280,7 @@ export default function HomeContent() {
               </p>
 
               {/* Flip animation: prefix + rotating phrase */}
-              <div className="mt-3 text-lg leading-[1.4] text-[var(--color-muted)] lg:text-xl">
+              <div data-hero className="mt-3 text-lg leading-[1.4] text-[var(--color-muted)] lg:text-xl">
                 <span>{flip.prefix} </span>
                 <span
                   className="inline-flex h-[1.4em] overflow-hidden align-bottom font-semibold text-[var(--color-accent)]"
@@ -175,7 +297,7 @@ export default function HomeContent() {
               </div>
 
               {/* Specialties pills */}
-              <div className="mt-7 flex flex-wrap gap-2">
+              <div data-hero className="mt-7 flex flex-wrap gap-2">
                 {profile.specialties.map((s) => (
                   <span
                     key={s}
@@ -186,29 +308,41 @@ export default function HomeContent() {
                 ))}
               </div>
 
-              {/* CTAs */}
-              <div className="mt-9 flex flex-wrap gap-3">
-                <Link
-                  href="/about"
-                  className="group inline-flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[var(--color-accent)]/25 transition-all duration-200 hover:shadow-xl hover:shadow-[var(--color-accent)]/30 hover:-translate-y-0.5 focus-ring"
-                >
-                  {ui.home.viewProjects}
-                  <svg className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </Link>
-                <Link
-                  href="/contact"
-                  className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-6 py-3 text-sm font-semibold shadow-sm transition-all duration-200 hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-accent-light)] hover:shadow-md hover:-translate-y-0.5 focus-ring"
-                >
-                  {ui.home.getInTouch}
-                </Link>
+              {/* CTAs — magnetic, with contextual cursor labels */}
+              <div data-hero className="mt-9 flex flex-wrap gap-3">
+                <Magnetic>
+                  <Link
+                    href="/about"
+                    data-cursor-text="→"
+                    className="group inline-flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[var(--color-accent)]/25 transition-all duration-200 hover:shadow-xl hover:shadow-[var(--color-accent)]/30 focus-ring"
+                  >
+                    {ui.home.viewProjects}
+                    <svg className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </Link>
+                </Magnetic>
+                <Magnetic>
+                  <Link
+                    href="/contact"
+                    data-cursor-text="→"
+                    className="inline-block rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-6 py-3 text-sm font-semibold shadow-sm transition-all duration-200 hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-accent-light)] hover:shadow-md focus-ring"
+                  >
+                    {ui.home.getInTouch}
+                  </Link>
+                </Magnetic>
               </div>
             </div>
 
             {/* Headshot */}
-            <div className="shrink-0 self-center sm:self-auto">
-              <div className="group/photo relative cursor-pointer" style={{ perspective: "600px" }}>
+            <div data-hero className="shrink-0 self-center sm:self-auto">
+              <div
+                className="group/photo relative cursor-pointer"
+                style={{ perspective: "600px" }}
+                data-cursor-text="こんにちは 👋"
+              >
+                {/* Slow-spinning dashed enso ring */}
+                <div className="slow-spin absolute -inset-3 rounded-full border border-dashed border-[var(--color-accent)]/30" />
                 {/* Glow ring */}
                 <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-[var(--color-accent)]/20 to-[var(--color-accent)]/5 blur-sm" />
                 <div className="relative h-56 w-56 transition-transform duration-500 [transform-style:preserve-3d] group-hover/photo:[transform:rotateY(180deg)]">
@@ -259,14 +393,19 @@ export default function HomeContent() {
         </div>
       </section>
 
-      {/* ── Divider ───────────────────────────── */}
+      {/* ── Sakura divider ────────────────────── */}
       <div className="mx-auto max-w-5xl px-6">
-        <hr className="border-[var(--color-border)]" />
+        <div className="jp-divider" aria-hidden="true">
+          <SakuraBlossom className="h-5 w-5 text-[var(--color-sakura)] opacity-70" />
+        </div>
       </div>
+
+      {/* ── Global impact map ─────────────────── */}
+      <GlobalImpactMap />
 
       {/* ── Skills ──────────────────────────────
           Note: cannot wrap in .reveal — its CSS transform breaks
-          GSAP ScrollTrigger pinning inside Skills. */}
+          the sticky-stack pinning inside Skills. */}
       <Skills />
 
       {/* ── CTA ───────────────────────────────── */}
@@ -276,24 +415,39 @@ export default function HomeContent() {
       >
         <div className="mx-auto max-w-5xl px-6">
           <div className="skills-card relative overflow-hidden px-8 py-16 text-center">
+            {/* Seigaiha wave texture along the top edge */}
+            <div
+              aria-hidden="true"
+              className="seigaiha pointer-events-none absolute inset-x-0 top-0 h-28 opacity-[0.06] dark:opacity-[0.1]"
+              style={{ maskImage: "linear-gradient(to bottom, #000, transparent)", WebkitMaskImage: "linear-gradient(to bottom, #000, transparent)" }}
+            />
             {/* Decorative gradient */}
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[var(--color-accent)]/8 via-transparent to-[var(--color-accent)]/8" />
             <div className="relative">
-              <h2 className="text-2xl font-bold tracking-tight">
+              {/* Hanko seal — 惠 */}
+              <div className="mb-6 flex justify-center">
+                <span className="hanko font-display" aria-hidden="true">
+                  惠
+                </span>
+              </div>
+              <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
                 {ui.home.interestedTitle}
               </h2>
               <p className="mx-auto mt-3 max-w-md text-sm text-[var(--color-muted)]">
                 {ui.home.interestedDesc}
               </p>
-              <Link
-                href="/contact"
-                className="group mt-8 inline-flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-[var(--color-accent)]/25 transition-all duration-200 hover:shadow-xl hover:shadow-[var(--color-accent)]/30 hover:-translate-y-0.5 focus-ring"
-              >
-                {ui.home.contactMe}
-                <svg className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </Link>
+              <Magnetic className="mt-8">
+                <Link
+                  href="/contact"
+                  data-cursor-text="→"
+                  className="group inline-flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-[var(--color-accent)]/25 transition-all duration-200 hover:shadow-xl hover:shadow-[var(--color-accent)]/30 focus-ring"
+                >
+                  {ui.home.contactMe}
+                  <svg className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </Link>
+              </Magnetic>
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Shippori_Mincho } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import Header from "@/components/Header";
@@ -10,6 +10,15 @@ import { LanguageProvider } from "@/components/LanguageProvider";
 import profile from "@/data/profile";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+
+// Japanese serif display face for the home-page redesign. Latin is preloaded;
+// kanji glyphs (惠, 世界…) load on demand via next/font's unicode-range slices.
+const shippori = Shippori_Mincho({
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+  variable: "--font-display",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: `${profile.name} – ${profile.specialties[0]} · ${profile.specialties[1]}`,
@@ -48,7 +57,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className={`${inter.variable} font-sans antialiased selection:bg-[var(--color-accent)] selection:text-white`}>
+      <body className={`${inter.variable} ${shippori.variable} font-sans antialiased selection:bg-[var(--color-accent)] selection:text-white`}>
         <ThemeProvider>
           <LanguageProvider>
             <div className="animate-page-in flex min-h-screen flex-col">
