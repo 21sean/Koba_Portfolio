@@ -222,12 +222,12 @@ export default function HomeContent() {
         <SakuraPetals count={12} />
 
         <div className="relative z-10 mx-auto max-w-5xl px-6">
-          {/* Giant kanji watermark — 恵 (Megumi, "blessing"), from 恵美 */}
+          {/* Giant kanji watermark — 惠 (Megumi, "blessing"), from 惠美 */}
           <div
             aria-hidden="true"
             className="font-display pointer-events-none absolute -left-10 -top-8 select-none text-[15rem] font-bold leading-none text-[var(--color-foreground)] opacity-[0.04] dark:opacity-[0.06] sm:-top-12 sm:text-[19rem]"
           >
-            恵
+            惠
           </div>
 
           {/* Vertical tategaki tagline (wide screens only) */}
@@ -256,7 +256,7 @@ export default function HomeContent() {
                 data-hero
                 className="font-display mt-3 text-base font-semibold tracking-[0.35em] text-[var(--color-muted)]"
               >
-                小林恵美
+                小林惠美
               </p>
 
               {/* Quantifiable headline with one inline animated number */}
@@ -424,10 +424,10 @@ export default function HomeContent() {
             {/* Decorative gradient */}
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[var(--color-accent)]/8 via-transparent to-[var(--color-accent)]/8" />
             <div className="relative">
-              {/* Hanko seal — 恵 */}
+              {/* Hanko seal — 惠 */}
               <div className="mb-6 flex justify-center">
                 <span className="hanko font-display" aria-hidden="true">
-                  恵
+                  惠
                 </span>
               </div>
               <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">

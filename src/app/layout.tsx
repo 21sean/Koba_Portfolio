@@ -12,7 +12,7 @@ import profile from "@/data/profile";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 // Japanese serif display face for the home-page redesign. Latin is preloaded;
-// kanji glyphs (恵, 世界…) load on demand via next/font's unicode-range slices.
+// kanji glyphs (惠, 世界…) load on demand via next/font's unicode-range slices.
 const shippori = Shippori_Mincho({
   subsets: ["latin"],
   weight: ["500", "600", "700", "800"],

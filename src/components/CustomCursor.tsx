@@ -2,63 +2,88 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
+import { assetPath } from "@/lib/basePath";
 
 /**
- * Custom cursor for the home page — an accent dot with a trailing ring.
+ * Custom cursor for the home page — a koi fish that swims after the pointer.
  *
- * - The ring lags behind the dot (GSAP quickTo) for a fluid, showcase feel.
- * - Hovering anything interactive grows the ring; elements can opt into a
- *   contextual label with `data-cursor-text="…"` (shown as a small pill).
- * - Every click bursts into sakura petals + an ink-ripple ring at the pointer.
- * - Mounts only for fine pointers (mouse/trackpad) and never when the user
- *   prefers reduced motion; touch devices keep their native behavior.
+ * - The koi trails the cursor with easing and rotates to face its heading, so
+ *   it looks like it's swimming toward wherever you move (a rAF lerp loop).
+ * - Hovering interactive elements makes the koi flick larger; elements can
+ *   surface a contextual label with `data-cursor-text="…"`.
+ * - Every click bursts into sakura petals + an ink-ripple ring.
+ * - Mounts only for fine pointers and never under prefers-reduced-motion;
+ *   touch devices keep native behavior.
  */
 
 // Sakura tints shared with SakuraPetals.
 const TINTS = ["#ffd6e3", "#ffc1d6", "#ffb7c5", "#ff9bb6", "#f3574d"];
+
+// koi-b.svg is drawn with its nose toward the upper-left (~-111° in screen
+// coords). Adding ~111° makes the fish point along its heading (heading 0 =
+// travel to the right). Tuned visually against the raw silhouette.
+const BASE_ROTATION = 111;
 
 const petalSvg = (color: string) =>
   `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:100%"><path d="M12 2 C6.5 8 6.5 14 12 22 C17.5 14 17.5 8 12 2 Z" fill="${color}"/></svg>`;
 
 export default function CustomCursor() {
   const layerRef = useRef<HTMLDivElement>(null);
-  const dotRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
+  const koiRef = useRef<HTMLDivElement>(null);
   const tagRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fine = window.matchMedia("(pointer: fine)").matches;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const layer = layerRef.current;
-    const dot = dotRef.current;
-    const ring = ringRef.current;
+    const koi = koiRef.current;
     const tag = tagRef.current;
-    if (!fine || reduced || !layer || !dot || !ring || !tag) return;
+    if (!fine || reduced || !layer || !koi || !tag) return;
 
     document.body.classList.add("custom-cursor-active");
-    gsap.set([dot, ring], { xPercent: -50, yPercent: -50, opacity: 0, force3D: true });
-    gsap.set(tag, { opacity: 0 });
+    gsap.set([koi, tag], { opacity: 0 });
 
-    const dotX = gsap.quickTo(dot, "x", { duration: 0.07, ease: "power2.out" });
-    const dotY = gsap.quickTo(dot, "y", { duration: 0.07, ease: "power2.out" });
-    const ringX = gsap.quickTo(ring, "x", { duration: 0.38, ease: "power3.out" });
-    const ringY = gsap.quickTo(ring, "y", { duration: 0.38, ease: "power3.out" });
     const tagX = gsap.quickTo(tag, "x", { duration: 0.32, ease: "power3.out" });
     const tagY = gsap.quickTo(tag, "y", { duration: 0.32, ease: "power3.out" });
 
+    let targetX = window.innerWidth / 2;
+    let targetY = window.innerHeight / 2;
+    let koiX = targetX;
+    let koiY = targetY;
+    let angle = 0;
+    let scale = 1;
+    let scaleTarget = 1;
     let visible = false;
     let hovering = false;
+    let raf = 0;
+
+    const tick = () => {
+      koiX += (targetX - koiX) * 0.16;
+      koiY += (targetY - koiY) * 0.16;
+      const dx = targetX - koiX;
+      const dy = targetY - koiY;
+      const dist = Math.hypot(dx, dy);
+      // Only re-aim while actually swimming, so the koi doesn't spin in place
+      // when the pointer is still.
+      if (dist > 2.2) {
+        const desired = (Math.atan2(dy, dx) * 180) / Math.PI + BASE_ROTATION;
+        const diff = ((desired - angle + 540) % 360) - 180;
+        angle += diff * 0.16;
+      }
+      scale += (scaleTarget - scale) * 0.2;
+      koi.style.transform = `translate(${koiX}px, ${koiY}px) translate(-50%, -50%) rotate(${angle}deg) scale(${scale})`;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
 
     const onMove = (e: PointerEvent) => {
+      targetX = e.clientX;
+      targetY = e.clientY;
       if (!visible) {
         visible = true;
-        gsap.to([dot, ring], { opacity: 1, duration: 0.25, overwrite: "auto" });
+        gsap.to(koi, { opacity: 1, duration: 0.3, overwrite: "auto" });
       }
-      dotX(e.clientX);
-      dotY(e.clientY);
-      ringX(e.clientX);
-      ringY(e.clientY);
-      tagX(e.clientX + 20);
+      tagX(e.clientX + 22);
       tagY(e.clientY + 20);
     };
 
@@ -71,13 +96,11 @@ export default function CustomCursor() {
       const target = interactive(e.target as Element);
       if (!target) return;
       hovering = true;
-      ring.classList.add("cc-ring-hover");
+      scaleTarget = 1.4;
       const text = target.getAttribute("data-cursor-text");
-      gsap.to(ring, { scale: text ? 2.1 : 1.8, duration: 0.3, ease: "power3.out", overwrite: "auto" });
-      gsap.to(dot, { scale: 0.5, duration: 0.3, ease: "power3.out", overwrite: "auto" });
       if (text) {
         tag.textContent = text;
-        gsap.to(tag, { opacity: 1, scale: 1, duration: 0.25, overwrite: "auto" });
+        gsap.to(tag, { opacity: 1, duration: 0.25, overwrite: "auto" });
       }
     };
 
@@ -86,16 +109,12 @@ export default function CustomCursor() {
       const to = interactive(e.relatedTarget as Element | null);
       if (!from || from === to) return;
       hovering = false;
-      ring.classList.remove("cc-ring-hover");
-      gsap.to(ring, { scale: 1, duration: 0.3, ease: "power3.out", overwrite: "auto" });
-      gsap.to(dot, { scale: 1, duration: 0.3, ease: "power3.out", overwrite: "auto" });
+      scaleTarget = 1;
       gsap.to(tag, { opacity: 0, duration: 0.2, overwrite: "auto" });
     };
 
-    // Click feedback: the ring squeezes on press, then a sakura burst +
-    // ink ripple fire at the pointer on release.
     const onDown = () => {
-      gsap.to(ring, { scale: hovering ? 1.4 : 0.75, duration: 0.15, ease: "power2.out", overwrite: "auto" });
+      scaleTarget = hovering ? 1.15 : 0.78;
     };
 
     const burst = (x: number, y: number) => {
@@ -123,15 +142,15 @@ export default function CustomCursor() {
         { scale: 1.6, opacity: 0, duration: 0.6, ease: "power2.out" }
       );
       petals.forEach((p, i) => {
-        const angle = (i / petals.length) * Math.PI * 2 + Math.random() * 0.8;
-        const dist = 34 + Math.random() * 34;
+        const a = (i / petals.length) * Math.PI * 2 + Math.random() * 0.8;
+        const dst = 34 + Math.random() * 34;
         gsap.fromTo(
           p,
           { x: 0, y: 0, scale: 0.9, opacity: 1, rotation: Math.random() * 360 },
           {
-            x: Math.cos(angle) * dist,
-            // Slight downward bias so petals feel like they flutter and fall.
-            y: Math.sin(angle) * dist + 16,
+            x: Math.cos(a) * dst,
+            // Slight downward bias so petals flutter and fall.
+            y: Math.sin(a) * dst + 16,
             scale: 0.25,
             opacity: 0,
             rotation: `+=${120 + Math.random() * 180}`,
@@ -144,13 +163,13 @@ export default function CustomCursor() {
     };
 
     const onUp = (e: PointerEvent) => {
-      gsap.to(ring, { scale: hovering ? 1.8 : 1, duration: 0.3, ease: "power3.out", overwrite: "auto" });
+      scaleTarget = hovering ? 1.4 : 1;
       burst(e.clientX, e.clientY);
     };
 
     const onLeaveDoc = () => {
       visible = false;
-      gsap.to([dot, ring, tag], { opacity: 0, duration: 0.25, overwrite: "auto" });
+      gsap.to([koi, tag], { opacity: 0, duration: 0.25, overwrite: "auto" });
     };
 
     window.addEventListener("pointermove", onMove, { passive: true });
@@ -168,14 +187,21 @@ export default function CustomCursor() {
       window.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointerup", onUp);
       document.documentElement.removeEventListener("pointerleave", onLeaveDoc);
-      gsap.killTweensOf([dot, ring, tag]);
+      cancelAnimationFrame(raf);
+      gsap.killTweensOf([koi, tag]);
     };
   }, []);
 
   return (
     <div ref={layerRef} className="cc-layer" aria-hidden="true">
-      <div ref={ringRef} className="cc-ring" />
-      <div ref={dotRef} className="cc-dot" />
+      <div
+        ref={koiRef}
+        className="cc-koi"
+        style={{
+          maskImage: `url(${assetPath("/koi-b.svg")})`,
+          WebkitMaskImage: `url(${assetPath("/koi-b.svg")})`,
+        }}
+      />
       <div ref={tagRef} className="cc-tag" />
     </div>
   );

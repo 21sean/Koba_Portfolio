@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
@@ -92,11 +92,14 @@ const CITIES: Record<string, { lon: number; lat: number }> = {
   paris: { lon: 2.35, lat: 48.86 },
 };
 
-// Per-city label nudges so pills near the map edge (Tokyo) or near each
-// other (Tokyo/Shanghai) don't clip or collide. Default is centered above.
-const LABEL_TRANSFORM: Record<string, string> = {
-  tokyo: "translate(-88%, -175%)",
-  shanghai: "translate(-50%, 80%)",
+// Hover-tooltip anchoring per marker. Left markers open toward the center
+// (rightward), right markers open leftward, so a ~210px card never clips the
+// map edge. Shanghai opens downward since Tokyo sits just above it.
+const TOOLTIP_TRANSFORM: Record<string, string> = {
+  sandiego: "translate(-12%, calc(-100% - 14px))",
+  paris: "translate(-50%, calc(-100% - 14px))",
+  tokyo: "translate(-88%, calc(-100% - 14px))",
+  shanghai: "translate(-88%, 14px)",
 };
 
 const ARCS: [string, string][] = [
@@ -115,8 +118,9 @@ interface ImpactCopy {
   kickerJp: string;
   title: string;
   subtitle: string;
+  hint: string;
   stats: { value: number; prefix?: string; suffix?: string; label: string }[];
-  locations: { id: string; flag: string; city: string; country: string; role: string }[];
+  locations: { id: string; flag: string; country: string; role: string }[];
 }
 
 const COPY: Record<Lang, ImpactCopy> = {
@@ -126,17 +130,17 @@ const COPY: Record<Lang, ImpactCopy> = {
     title: "Marketing without borders.",
     subtitle:
       "Campaigns planned in Tokyo, localized for Shanghai, scaled across Europe — and led today from San Diego.",
+    hint: "Hover a marker to see the market",
     stats: [
       { value: 140, prefix: "+", suffix: "%", label: "Revenue growth led from Tokyo" },
       { value: 7, suffix: "+", label: "Years in global B2B marketing" },
       { value: 4, label: "Working languages" },
-      { value: 3, label: "Continents of campaign delivery" },
     ],
     locations: [
-      { id: "sandiego", flag: "🇺🇸", city: "San Diego", country: "United States", role: "Home base — MBA at UC San Diego, marketing at Dassault Systèmes BIOVIA" },
-      { id: "tokyo", flag: "🇯🇵", city: "Tokyo", country: "Japan", role: "6+ years leading global B2B semiconductor marketing & GTM strategy" },
-      { id: "shanghai", flag: "🇨🇳", city: "Shanghai", country: "China", role: "Native-fluency market — campaigns in Mandarin & Shanghainese" },
-      { id: "paris", flag: "🇫🇷", city: "Paris", country: "France", role: "Dassault Systèmes HQ — global SaaS campaigns across EU markets" },
+      { id: "sandiego", flag: "🇺🇸", country: "United States", role: "Home base — MBA at UC San Diego, marketing at Dassault Systèmes BIOVIA" },
+      { id: "tokyo", flag: "🇯🇵", country: "Japan", role: "6+ years leading global B2B semiconductor marketing & GTM strategy" },
+      { id: "shanghai", flag: "🇨🇳", country: "China", role: "Native-fluency market — campaigns in Mandarin & Shanghainese" },
+      { id: "paris", flag: "🇪🇺", country: "Europe", role: "Dassault Systèmes HQ — global SaaS campaigns across EU markets" },
     ],
   },
   ja: {
@@ -145,17 +149,17 @@ const COPY: Record<Lang, ImpactCopy> = {
     title: "国境を越えるマーケティング。",
     subtitle:
       "東京で立案し、上海へローカライズ、欧州へスケール。現在はサンディエゴから世界のキャンペーンを指揮。",
+    hint: "マーカーにカーソルを合わせると市場が表示されます",
     stats: [
       { value: 140, prefix: "+", suffix: "%", label: "東京から牽引した売上成長" },
       { value: 7, suffix: "+", label: "グローバルB2Bマーケティング歴（年）" },
       { value: 4, label: "ビジネスで使う言語" },
-      { value: 3, label: "キャンペーンを展開した大陸" },
     ],
     locations: [
-      { id: "sandiego", flag: "🇺🇸", city: "サンディエゴ", country: "アメリカ", role: "現在の拠点 — UCサンディエゴMBA在学、ダッソー・システムズBIOVIAでマーケティング" },
-      { id: "tokyo", flag: "🇯🇵", city: "東京", country: "日本", role: "半導体グローバルB2BマーケティングとGTM戦略を6年以上リード" },
-      { id: "shanghai", flag: "🇨🇳", city: "上海", country: "中国", role: "ネイティブ市場 — 中国語・上海語でのキャンペーン展開" },
-      { id: "paris", flag: "🇫🇷", city: "パリ", country: "フランス", role: "ダッソー・システムズ本社 — 欧州市場向けグローバルSaaSキャンペーン" },
+      { id: "sandiego", flag: "🇺🇸", country: "アメリカ", role: "現在の拠点 — UCサンディエゴMBA在学、ダッソー・システムズBIOVIAでマーケティング" },
+      { id: "tokyo", flag: "🇯🇵", country: "日本", role: "半導体グローバルB2BマーケティングとGTM戦略を6年以上リード" },
+      { id: "shanghai", flag: "🇨🇳", country: "中国", role: "ネイティブ市場 — 中国語・上海語でのキャンペーン展開" },
+      { id: "paris", flag: "🇪🇺", country: "ヨーロッパ", role: "ダッソー・システムズ本社 — 欧州市場向けグローバルSaaSキャンペーン" },
     ],
   },
   zh: {
@@ -164,17 +168,17 @@ const COPY: Record<Lang, ImpactCopy> = {
     title: "跨越国界的营销。",
     subtitle:
       "在东京策划，在上海本地化，在欧洲扩展——如今在圣地亚哥主导全球营销。",
+    hint: "将光标悬停在标记上即可查看市场",
     stats: [
       { value: 140, prefix: "+", suffix: "%", label: "从东京推动的营收增长" },
       { value: 7, suffix: "+", label: "全球B2B营销经验（年）" },
       { value: 4, label: "工作语言" },
-      { value: 3, label: "营销覆盖的大洲" },
     ],
     locations: [
-      { id: "sandiego", flag: "🇺🇸", city: "圣地亚哥", country: "美国", role: "现居地 — 加州大学圣地亚哥分校MBA在读，就职于达索系统BIOVIA" },
-      { id: "tokyo", flag: "🇯🇵", city: "东京", country: "日本", role: "领导半导体全球B2B营销与市场进入战略6年以上" },
-      { id: "shanghai", flag: "🇨🇳", city: "上海", country: "中国", role: "母语市场 — 以中文与上海话开展营销活动" },
-      { id: "paris", flag: "🇫🇷", city: "巴黎", country: "法国", role: "达索系统总部 — 面向欧洲市场的全球SaaS营销" },
+      { id: "sandiego", flag: "🇺🇸", country: "美国", role: "现居地 — 加州大学圣地亚哥分校MBA在读，就职于达索系统BIOVIA" },
+      { id: "tokyo", flag: "🇯🇵", country: "日本", role: "领导半导体全球B2B营销与市场进入战略6年以上" },
+      { id: "shanghai", flag: "🇨🇳", country: "中国", role: "母语市场 — 以中文与上海话开展营销活动" },
+      { id: "paris", flag: "🇪🇺", country: "欧洲", role: "达索系统总部 — 面向欧洲市场的全球SaaS营销" },
     ],
   },
 };
@@ -185,6 +189,7 @@ export default function GlobalImpactMap() {
   const { lang } = useLanguage();
   const copy = COPY[lang];
   const sectionRef = useRef<HTMLElement>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   // Deterministic — identical on server and client, so no hydration drift.
   const dots = useMemo(() => {
@@ -321,6 +326,10 @@ export default function GlobalImpactMap() {
           <p className="mt-4 text-base leading-relaxed text-[var(--color-muted)] sm:text-lg">
             {copy.subtitle}
           </p>
+          <p className="mt-4 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]">
+            <span aria-hidden="true" className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--color-accent)]" />
+            {copy.hint}
+          </p>
         </div>
 
         {/* Map */}
@@ -357,43 +366,58 @@ export default function GlobalImpactMap() {
               <circle key={i} className="impact-pulse" r="2.4" fill="var(--color-sakura)" opacity="0" />
             ))}
 
-            {/* City markers */}
+            {/* City markers — hover/tap surfaces a tooltip for that market */}
             {copy.locations.map((loc) => {
               const p = cityPx[loc.id];
+              const active = activeId === loc.id;
               return (
-                <g key={loc.id} className="impact-marker">
-                  <circle cx={p.x} cy={p.y} r="8" fill="var(--color-accent)" opacity="0.14" />
+                <g
+                  key={loc.id}
+                  className="impact-marker"
+                  style={{ cursor: "none" }}
+                  onPointerEnter={() => setActiveId(loc.id)}
+                  onPointerLeave={() => setActiveId((cur) => (cur === loc.id ? null : cur))}
+                  onClick={() => setActiveId((cur) => (cur === loc.id ? null : loc.id))}
+                >
+                  <circle cx={p.x} cy={p.y} r="9" fill="var(--color-accent)" opacity={active ? 0.28 : 0.14} />
                   <circle cx={p.x} cy={p.y} r="8" fill="none" stroke="var(--color-accent)" strokeWidth="1" opacity="0.5" className="map-ping" />
-                  <circle cx={p.x} cy={p.y} r="3.2" fill="var(--color-accent)" stroke="var(--color-background)" strokeWidth="1.4" />
+                  <circle cx={p.x} cy={p.y} r={active ? 4.4 : 3.2} fill="var(--color-accent)" stroke="var(--color-background)" strokeWidth="1.4" />
+                  {/* Generous invisible hit area for easy hovering */}
+                  <circle cx={p.x} cy={p.y} r="17" fill="transparent" style={{ pointerEvents: "all" }} />
                 </g>
               );
             })}
           </svg>
 
-          {/* City name pills (HTML, % positioned over the SVG) */}
+          {/* Hover tooltips (HTML, % positioned over the SVG) */}
           {copy.locations.map((loc) => {
             const p = cityPx[loc.id];
+            const active = activeId === loc.id;
             return (
-              <span
+              <div
                 key={loc.id}
-                className="map-city-label"
+                className={`map-tooltip ${active ? "is-active" : ""}`}
                 style={{
                   left: `${(p.x / MAP_W) * 100}%`,
                   top: `${(p.y / MAP_H) * 100}%`,
-                  transform: LABEL_TRANSFORM[loc.id],
+                  transform: TOOLTIP_TRANSFORM[loc.id],
                 }}
               >
-                {loc.city}
-              </span>
+                <div className="map-tooltip-head">
+                  <span aria-hidden="true">{loc.flag}</span>
+                  {loc.country}
+                </div>
+                <p className="map-tooltip-body">{loc.role}</p>
+              </div>
             );
           })}
         </div>
 
-        {/* Stats */}
-        <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4" data-map-reveal>
+        {/* Stats — compact row */}
+        <div className="mx-auto mt-10 grid max-w-2xl grid-cols-3 gap-2.5 sm:gap-3" data-map-reveal>
           {copy.stats.map((stat) => (
-            <div key={stat.label} className="glass-card glass-card-hover px-5 py-6 text-center">
-              <div className="font-display text-3xl font-bold tabular-nums text-[var(--color-accent)] sm:text-4xl">
+            <div key={stat.label} className="glass-card glass-card-hover px-3 py-4 text-center">
+              <div className="font-display text-2xl font-bold tabular-nums text-[var(--color-accent)] sm:text-3xl">
                 <CountUp
                   end={stat.value}
                   prefix={stat.prefix ?? ""}
@@ -401,28 +425,8 @@ export default function GlobalImpactMap() {
                   durationMs={1600}
                 />
               </div>
-              <div className="mt-2 text-xs font-medium leading-snug text-[var(--color-muted)] sm:text-sm">
+              <div className="mt-1.5 text-[0.68rem] font-medium leading-snug text-[var(--color-muted)] sm:text-xs">
                 {stat.label}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Location detail cards */}
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 sm:gap-4" data-map-reveal>
-          {copy.locations.map((loc) => (
-            <div key={loc.id} className="glass-card glass-card-hover flex items-start gap-3.5 px-5 py-4">
-              <span aria-hidden="true" className="mt-0.5 text-xl leading-none">
-                {loc.flag}
-              </span>
-              <div>
-                <div className="text-sm font-semibold">
-                  {loc.city}
-                  <span className="ml-2 text-xs font-normal text-[var(--color-muted)]">{loc.country}</span>
-                </div>
-                <p className="mt-1 text-xs leading-relaxed text-[var(--color-muted)] sm:text-[0.8rem]">
-                  {loc.role}
-                </p>
               </div>
             </div>
           ))}

@@ -555,31 +555,22 @@ body > * {
   pointer-events: none;
 }
 
-.cc-dot {
+/* Koi cursor — a tinted silhouette of koi-b.svg driven by JS transforms. */
+.cc-koi {
   position: fixed;
   top: 0;
   left: 0;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--color-accent);
-}
-
-.cc-ring {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1.5px solid color-mix(in srgb, var(--color-accent) 65%, transparent);
-  background: transparent;
-  transition: background 0.25s ease, border-color 0.25s ease;
-}
-
-.cc-ring.cc-ring-hover {
-  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
-  border-color: color-mix(in srgb, var(--color-accent) 90%, transparent);
+  width: 30px;
+  height: 38px;
+  background: var(--color-sakura);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  filter: drop-shadow(0 2px 4px color-mix(in srgb, var(--color-sakura) 45%, transparent));
+  will-change: transform;
 }
 
 .cc-tag {
@@ -634,21 +625,48 @@ body > * {
   animation: map-ping 2.8s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
-.map-city-label {
+/* Marker hover tooltip — hidden until its marker is hovered/tapped. */
+.map-tooltip {
   position: absolute;
-  transform: translate(-50%, -145%);
-  padding: 0.15rem 0.55rem;
-  border-radius: 9999px;
+  width: 210px;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
-  background: color-mix(in srgb, var(--color-card) 88%, transparent);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-  box-shadow: 0 2px 8px var(--color-shadow);
+  background: color-mix(in srgb, var(--color-card) 94%, transparent);
+  backdrop-filter: blur(10px) saturate(160%);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
+  box-shadow: 0 10px 30px -10px var(--color-shadow-lg);
   pointer-events: none;
+  opacity: 0;
+  scale: 0.94;
+  transition: opacity 0.22s ease, scale 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 5;
+}
+
+.map-tooltip.is-active {
+  opacity: 1;
+  scale: 1;
+}
+
+.map-tooltip-head {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-foreground);
+}
+
+.map-tooltip-head span {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.map-tooltip-body {
+  margin-top: 0.3rem;
+  font-size: 0.7rem;
+  line-height: 1.45;
+  color: var(--color-muted);
 }
 
 @media (prefers-reduced-motion: reduce) {
