@@ -676,10 +676,30 @@ body > * {
 }
 
 .map-tooltip-body {
-  margin-top: 0.3rem;
+  margin-top: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
   font-size: 0.7rem;
-  line-height: 1.45;
+  line-height: 1.4;
   color: var(--color-muted);
+  list-style: none;
+}
+
+.map-tooltip-body li {
+  position: relative;
+  padding-left: 0.7rem;
+}
+
+.map-tooltip-body li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.42em;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--color-accent);
 }
 
 @media (prefers-reduced-motion: reduce) {

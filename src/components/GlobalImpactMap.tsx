@@ -120,7 +120,7 @@ interface ImpactCopy {
   subtitle: string;
   hint: string;
   stats: { value: number; prefix?: string; suffix?: string; label: string }[];
-  locations: { id: string; flag: string; country: string; role: string }[];
+  locations: { id: string; flag: string; country: string; points: string[] }[];
 }
 
 const COPY: Record<Lang, ImpactCopy> = {
@@ -137,10 +137,10 @@ const COPY: Record<Lang, ImpactCopy> = {
       { value: 4, label: "Working languages" },
     ],
     locations: [
-      { id: "sandiego", flag: "🇺🇸", country: "United States", role: "Home base: MBA at UC San Diego, marketing at Dassault Systèmes BIOVIA. Moretec Group: led global B2B semiconductor marketing & GTM across North America, driving +140% revenue growth" },
-      { id: "tokyo", flag: "🇯🇵", country: "Japan", role: "Moretec Group: 6+ years leading global B2B semiconductor marketing & GTM strategy, driving +140% revenue growth" },
-      { id: "shanghai", flag: "🇨🇳", country: "China", role: "Native-fluency market: campaigns in Mandarin & Shanghainese. Moretec Group: led global B2B semiconductor marketing & GTM across China, driving +140% revenue growth" },
-      { id: "paris", flag: "🇪🇺", country: "Europe", role: "Dassault Systèmes HQ: global SaaS campaigns across EU markets. Moretec Group: led global B2B semiconductor marketing & GTM across Europe, driving +140% revenue growth" },
+      { id: "sandiego", flag: "🇺🇸", country: "United States", points: ["Home base — MBA at UC San Diego", "Marketing at Dassault Systèmes BIOVIA", "Moretec: led North America GTM, +140% revenue"] },
+      { id: "tokyo", flag: "🇯🇵", country: "Japan", points: ["Moretec: 6+ years leading B2B semiconductor marketing", "Drove +140% revenue growth & GTM strategy"] },
+      { id: "shanghai", flag: "🇨🇳", country: "China", points: ["Native market — campaigns in Mandarin & Shanghainese", "Moretec: led China GTM, +140% revenue"] },
+      { id: "paris", flag: "🇪🇺", country: "Europe", points: ["Dassault Systèmes HQ — global SaaS across EU", "Moretec: led Europe GTM, +140% revenue"] },
     ],
   },
   ja: {
@@ -156,10 +156,10 @@ const COPY: Record<Lang, ImpactCopy> = {
       { value: 4, label: "ビジネスで使う言語" },
     ],
     locations: [
-      { id: "sandiego", flag: "🇺🇸", country: "アメリカ", role: "現在の拠点：UCサンディエゴMBA在学、ダッソー・システムズBIOVIAでマーケティング。Moretec Group：北米での半導体グローバルB2BマーケティングとGTMをリードし、売上140%成長を牽引" },
-      { id: "tokyo", flag: "🇯🇵", country: "日本", role: "Moretec Group：半導体グローバルB2BマーケティングとGTM戦略を6年以上リードし、売上140%成長を牽引" },
-      { id: "shanghai", flag: "🇨🇳", country: "中国", role: "ネイティブ市場：中国語・上海語でのキャンペーン展開。Moretec Group：中国での半導体グローバルB2BマーケティングとGTMをリードし、売上140%成長を牽引" },
-      { id: "paris", flag: "🇪🇺", country: "ヨーロッパ", role: "ダッソー・システムズ本社：欧州市場向けグローバルSaaSキャンペーン。Moretec Group：欧州での半導体グローバルB2BマーケティングとGTMをリードし、売上140%成長を牽引" },
+      { id: "sandiego", flag: "🇺🇸", country: "アメリカ", points: ["現在の拠点 — UCサンディエゴでMBA在学", "ダッソー・システムズBIOVIAでマーケティング", "Moretec：北米GTMを主導、売上+140%"] },
+      { id: "tokyo", flag: "🇯🇵", country: "日本", points: ["Moretec：半導体B2Bマーケティングを6年以上主導", "GTM戦略で売上+140%成長を牽引"] },
+      { id: "shanghai", flag: "🇨🇳", country: "中国", points: ["ネイティブ市場 — 中国語・上海語でキャンペーン", "Moretec：中国GTMを主導、売上+140%"] },
+      { id: "paris", flag: "🇪🇺", country: "ヨーロッパ", points: ["ダッソー・システムズ本社 — 欧州向けSaaS", "Moretec：欧州GTMを主導、売上+140%"] },
     ],
   },
   zh: {
@@ -175,10 +175,10 @@ const COPY: Record<Lang, ImpactCopy> = {
       { value: 4, label: "工作语言" },
     ],
     locations: [
-      { id: "sandiego", flag: "🇺🇸", country: "美国", role: "现居地：加州大学圣地亚哥分校MBA在读，就职于达索系统BIOVIA。Moretec Group：领导北美半导体全球B2B营销与市场进入战略，推动营收增长140%" },
-      { id: "tokyo", flag: "🇯🇵", country: "日本", role: "Moretec Group：领导半导体全球B2B营销与市场进入战略6年以上，推动营收增长140%" },
-      { id: "shanghai", flag: "🇨🇳", country: "中国", role: "母语市场：以中文与上海话开展营销活动。Moretec Group：领导中国半导体全球B2B营销与市场进入战略，推动营收增长140%" },
-      { id: "paris", flag: "🇪🇺", country: "欧洲", role: "达索系统总部：面向欧洲市场的全球SaaS营销。Moretec Group：领导欧洲半导体全球B2B营销与市场进入战略，推动营收增长140%" },
+      { id: "sandiego", flag: "🇺🇸", country: "美国", points: ["现居地 — 加州大学圣地亚哥分校MBA在读", "就职于达索系统BIOVIA，负责营销", "Moretec：主导北美GTM，营收+140%"] },
+      { id: "tokyo", flag: "🇯🇵", country: "日本", points: ["Moretec：主导半导体B2B营销6年以上", "以GTM战略推动营收增长140%"] },
+      { id: "shanghai", flag: "🇨🇳", country: "中国", points: ["母语市场 — 以中文与上海话开展营销", "Moretec：主导中国GTM，营收+140%"] },
+      { id: "paris", flag: "🇪🇺", country: "欧洲", points: ["达索系统总部 — 面向欧洲市场的SaaS", "Moretec：主导欧洲GTM，营收+140%"] },
     ],
   },
 };
@@ -406,7 +406,11 @@ export default function GlobalImpactMap() {
                 <div className="map-tooltip-head">
                   {loc.country}
                 </div>
-                <p className="map-tooltip-body">{loc.role}</p>
+                <ul className="map-tooltip-body">
+                  {loc.points.map((point) => (
+                    <li key={point}>{point}</li>
+                  ))}
+                </ul>
               </div>
             );
           })}
