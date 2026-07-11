@@ -75,7 +75,7 @@ export default function ResumeContent() {
       />
       <div className="relative z-10 mx-auto max-w-3xl px-6 print:max-w-none print:px-8">
         {/* ── Header ────────────────────────────── */}
-        <header className="mb-10 border-b border-[var(--color-border)] pb-8">
+        <header className="mb-10 pb-8">
           <div className="min-w-0">
             <h1 className="text-3xl font-extrabold tracking-tight">
               {profile.name}
@@ -106,9 +106,11 @@ export default function ResumeContent() {
         {/* ── Summary ───────────────────────────── */}
         <div id="resume-summary" className="mb-10 scroll-mt-20">
           <SectionHeading className="mb-3">{ui.resume.summary}</SectionHeading>
-          <p className="text-sm leading-relaxed text-[var(--color-muted)]">
-            {profile.summary}
-          </p>
+          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-sm print:border-0 print:bg-transparent print:p-0 print:shadow-none">
+            <p className="text-sm leading-relaxed text-[var(--color-foreground)]">
+              {profile.summary}
+            </p>
+          </div>
         </div>
 
         {/* ── Languages ─────────────────────────── */}
