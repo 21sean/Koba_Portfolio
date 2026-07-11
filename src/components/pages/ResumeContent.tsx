@@ -75,8 +75,8 @@ export default function ResumeContent() {
       />
       <div className="relative z-10 mx-auto max-w-3xl px-6 print:max-w-none print:px-8">
         {/* ── Header ────────────────────────────── */}
-        <header className="mb-10 flex items-center gap-6 border-b border-[var(--color-border)] pb-8">
-          <div className="flex-1 min-w-0">
+        <header className="mb-10 pb-8">
+          <div className="min-w-0">
             <h1 className="text-3xl font-extrabold tracking-tight">
               {profile.name}
             </h1>
@@ -101,20 +101,16 @@ export default function ResumeContent() {
               )}
             </p>
           </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/about-photo.jpg"
-            alt={profile.name}
-            className="h-32 w-32 shrink-0 rounded-full border-2 border-[var(--color-border)] object-cover shadow-lg ring-4 ring-[var(--color-background)] sm:h-40 sm:w-40"
-          />
         </header>
 
         {/* ── Summary ───────────────────────────── */}
         <div id="resume-summary" className="mb-10 scroll-mt-20">
           <SectionHeading className="mb-3">{ui.resume.summary}</SectionHeading>
-          <p className="text-sm leading-relaxed text-[var(--color-muted)]">
-            {profile.summary}
-          </p>
+          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-sm print:border-0 print:bg-transparent print:p-0 print:shadow-none">
+            <p className="text-sm leading-relaxed text-[var(--color-foreground)]">
+              {profile.summary}
+            </p>
+          </div>
         </div>
 
         {/* ── Languages ─────────────────────────── */}

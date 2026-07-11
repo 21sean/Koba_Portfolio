@@ -449,6 +449,18 @@ body > * {
 .cloud-drift { left: 0; animation: cloud-drift linear infinite; }
 .cloud-drift-slow { right: 0; animation: cloud-drift-slow linear infinite; }
 
+/* Sun / moon rising from behind Mount Fuji's peak up into the sky. Plays once
+   on mount; because the sun and moon are display-toggled by the `.dark` theme
+   class, flipping light↔dark re-runs it for whichever body becomes visible. */
+@keyframes celestial-rise {
+  from { transform: translateY(96%); }
+  to   { transform: translateY(0); }
+}
+.celestial-rise {
+  animation: celestial-rise 2.6s cubic-bezier(0.42, 0, 0.32, 1) both;
+  will-change: transform;
+}
+
 /* Falling petals: outer span falls, inner span sways + tumbles. */
 @keyframes sakura-fall {
   from { transform: translateY(-15vh); }
@@ -487,7 +499,8 @@ body > * {
   .sakura-fall,
   .sakura-sway,
   .koi-drift,
-  .koi-drift-slow {
+  .koi-drift-slow,
+  .celestial-rise {
     animation: none !important;
   }
   /* Hide the petals entirely when motion is reduced — a frozen petal field
