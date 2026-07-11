@@ -181,12 +181,12 @@ const profile: Profile = {
       skills: ["Power BI", "Data Modeling", "Data Analysis", "Business Intelligence"],
     },
     {
-      name: "IBM AI Product Manager Specialization",
-      issuer: "IBM",
-      date: "May 2026",
-      credentialId: "KB3PL0HID9B5",
-      credentialUrl: "https://www.coursera.org/account/accomplishments/specialization/KB3PL0HID9B5",
-      skills: ["Artificial Intelligence (AI)", "Product Management", "AI Strategy", "Agile Project Management"],
+      name: "Adobe Marketing Specialist",
+      issuer: "Adobe",
+      date: "Jun 2026",
+      credentialId: "0JTYHEWUZCX3",
+      credentialUrl: "https://www.coursera.org/account/accomplishments/specialization/0JTYHEWUZCX3",
+      skills: ["Digital Marketing Strategy", "Marketing Analytics", "Content Creation", "Adobe Analytics"],
     },
     {
       name: "Google Project Management Specialization",
@@ -195,6 +195,14 @@ const profile: Profile = {
       credentialId: "J04REFMDB4TC",
       credentialUrl: "https://www.coursera.org/account/accomplishments/specialization/J04REFMDB4TC",
       skills: ["Project Management", "Agile Project Management", "Agile Methodologies", "Cross-functional Collaboration"],
+    },
+    {
+      name: "IBM AI Product Manager Specialization",
+      issuer: "IBM",
+      date: "May 2026",
+      credentialId: "KB3PL0HID9B5",
+      credentialUrl: "https://www.coursera.org/account/accomplishments/specialization/KB3PL0HID9B5",
+      skills: ["Artificial Intelligence (AI)", "Product Management", "AI Strategy", "Agile Project Management"],
     },
     {
       name: "Google AI Professional Certificate",
