@@ -8,6 +8,7 @@ import FooterScene from "@/components/FooterScene";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import profile from "@/data/profile";
+import { SITE_URL } from "@/lib/site";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -21,8 +22,16 @@ const shippori = Shippori_Mincho({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: `${profile.name} – ${profile.specialties[0]} · ${profile.specialties[1]}`,
   description: profile.summary,
+  // Allow ordinary search indexing; opt out of AI training/scraping. The
+  // noai/noimageai directives sit alongside robots.txt and the TDM
+  // reservation as a per-page signal for crawlers that read meta tags.
+  // Set via `other` so the standard and AI tokens share one robots meta tag.
+  other: {
+    robots: "index, follow, noai, noimageai",
+  },
   openGraph: {
     title: profile.name,
     description: profile.headline,
