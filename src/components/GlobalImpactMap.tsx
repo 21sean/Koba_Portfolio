@@ -137,10 +137,10 @@ const COPY: Record<Lang, ImpactCopy> = {
       { value: 4, label: "Working languages" },
     ],
     locations: [
-      { id: "sandiego", flag: "🇺🇸", country: "United States", points: ["UC San Diego: pursuing MBA", "Dassault Systèmes: marketing at BIOVIA", "Moretec: led North America GTM, +140% revenue"] },
+      { id: "sandiego", flag: "🇺🇸", country: "United States", points: ["UC San Diego: earned MBA", "Dassault Systèmes: marketing at BIOVIA", "Moretec: drove North America GTM strategy"] },
       { id: "tokyo", flag: "🇯🇵", country: "Japan", points: ["Moretec: 6+ years leading B2B semiconductor marketing", "Impact: +140% revenue from GTM strategy"] },
-      { id: "shanghai", flag: "🇨🇳", country: "China", points: ["Native market: campaigns in Mandarin and Shanghainese", "Moretec: led China GTM, +140% revenue"] },
-      { id: "paris", flag: "🇪🇺", country: "Europe", points: ["Dassault Systèmes: global SaaS across EU markets", "Moretec: led Europe GTM, +140% revenue"] },
+      { id: "shanghai", flag: "🇨🇳", country: "China", points: ["Native market: campaigns in Mandarin and Shanghainese", "Moretec: grew China market with localized GTM"] },
+      { id: "paris", flag: "🇪🇺", country: "Europe", points: ["Dassault Systèmes: global SaaS across EU markets", "Moretec: scaled GTM across European markets"] },
     ],
   },
   ja: {
@@ -156,10 +156,10 @@ const COPY: Record<Lang, ImpactCopy> = {
       { value: 4, label: "ビジネスで使う言語" },
     ],
     locations: [
-      { id: "sandiego", flag: "🇺🇸", country: "アメリカ", points: ["UCサンディエゴ：MBA在学", "ダッソー・システムズ：BIOVIAでマーケティング", "Moretec：北米GTMを主導、売上+140%"] },
+      { id: "sandiego", flag: "🇺🇸", country: "アメリカ", points: ["UCサンディエゴ：MBA取得", "ダッソー・システムズ：BIOVIAでマーケティング", "Moretec：北米GTM戦略を推進"] },
       { id: "tokyo", flag: "🇯🇵", country: "日本", points: ["Moretec：B2B半導体マーケティングを6年以上主導", "実績：GTM戦略で売上+140%成長"] },
-      { id: "shanghai", flag: "🇨🇳", country: "中国", points: ["ネイティブ市場：中国語・上海語でキャンペーン", "Moretec：中国GTMを主導、売上+140%"] },
-      { id: "paris", flag: "🇪🇺", country: "ヨーロッパ", points: ["ダッソー・システムズ：欧州向けグローバルSaaS", "Moretec：欧州GTMを主導、売上+140%"] },
+      { id: "shanghai", flag: "🇨🇳", country: "中国", points: ["ネイティブ市場：中国語・上海語でキャンペーン", "Moretec：ローカライズで中国市場を拡大"] },
+      { id: "paris", flag: "🇪🇺", country: "ヨーロッパ", points: ["ダッソー・システムズ：欧州向けグローバルSaaS", "Moretec：欧州市場でGTMを展開"] },
     ],
   },
   zh: {
@@ -175,10 +175,10 @@ const COPY: Record<Lang, ImpactCopy> = {
       { value: 4, label: "工作语言" },
     ],
     locations: [
-      { id: "sandiego", flag: "🇺🇸", country: "美国", points: ["加州大学圣地亚哥分校：MBA在读", "达索系统：BIOVIA营销", "Moretec：主导北美GTM，营收+140%"] },
+      { id: "sandiego", flag: "🇺🇸", country: "美国", points: ["加州大学圣地亚哥分校：获得MBA学位", "达索系统：BIOVIA营销", "Moretec：推动北美GTM战略"] },
       { id: "tokyo", flag: "🇯🇵", country: "日本", points: ["Moretec：主导B2B半导体营销6年以上", "成果：以GTM战略推动营收增长140%"] },
-      { id: "shanghai", flag: "🇨🇳", country: "中国", points: ["母语市场：以中文与上海话开展营销", "Moretec：主导中国GTM，营收+140%"] },
-      { id: "paris", flag: "🇪🇺", country: "欧洲", points: ["达索系统：面向欧洲的全球SaaS营销", "Moretec：主导欧洲GTM，营收+140%"] },
+      { id: "shanghai", flag: "🇨🇳", country: "中国", points: ["母语市场：以中文与上海话开展营销", "Moretec：以本地化拓展中国市场"] },
+      { id: "paris", flag: "🇪🇺", country: "欧洲", points: ["达索系统：面向欧洲的全球SaaS营销", "Moretec：在欧洲市场推进GTM"] },
     ],
   },
 };
