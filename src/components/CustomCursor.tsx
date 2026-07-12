@@ -12,8 +12,8 @@ import { assetPath } from "@/lib/basePath";
  * - Hovering interactive elements makes the koi flick larger; elements can
  *   surface a contextual label with `data-cursor-text="…"`.
  * - Every click bursts into sakura petals + an ink-ripple ring.
- * - Mounts only for fine pointers and never under prefers-reduced-motion;
- *   touch devices keep native behavior.
+ * - Mounts only for hover-capable fine pointers and never under
+ *   prefers-reduced-motion; touch/mobile devices keep native behavior.
  */
 
 // Sakura tints shared with SakuraPetals.
@@ -33,12 +33,17 @@ export default function CustomCursor() {
   const tagRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Require a hover-capable fine pointer: touch/mobile devices report
+    // `hover: none` (and often a coarse pointer), so they keep the native
+    // cursor. Some phones/tablets claim `pointer: fine`, which is why the
+    // hover check is what actually keeps the koi off mobile.
     const fine = window.matchMedia("(pointer: fine)").matches;
+    const canHover = window.matchMedia("(hover: hover)").matches;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const layer = layerRef.current;
     const koi = koiRef.current;
     const tag = tagRef.current;
-    if (!fine || reduced || !layer || !koi || !tag) return;
+    if (!fine || !canHover || reduced || !layer || !koi || !tag) return;
 
     document.body.classList.add("custom-cursor-active");
     gsap.set([koi, tag], { opacity: 0 });
