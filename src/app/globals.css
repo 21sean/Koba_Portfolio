@@ -568,13 +568,17 @@ body > * {
   pointer-events: none;
 }
 
-/* Koi cursor — a tinted silhouette of koi-b.svg driven by JS transforms. */
+/* Koi cursor — a tinted silhouette of koi-b.svg driven by JS transforms.
+   Hidden by default; the cursor effect fades it in on first pointer move.
+   This keeps the koi off touch/mobile devices (and reduced-motion), where
+   the effect bails out early and never sets opacity itself. */
 .cc-koi {
   position: fixed;
   top: 0;
   left: 0;
   width: 30px;
   height: 38px;
+  opacity: 0;
   background: var(--color-sakura);
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
