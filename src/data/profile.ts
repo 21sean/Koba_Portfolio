@@ -230,7 +230,7 @@ const profile: Profile = {
       logo: "/logos/dassault.jpeg",
       bullets: [
         "Mapped the competitive and cross-market landscape across life sciences, materials science, and informatics segments, turning competitor positioning, white space, and unmet needs into a segment prioritization view used in annual marketing planning and GTM targeting.",
-        "Directed end-to-end strategy for global campaigns and industry events (trade shows, conferences, webinars), covering messaging, vendor and budget management, and timelines; drove cross-functional alignment with sales and technical stakeholders to convert event contacts into qualified pipeline.",
+        "Directed end-to-end strategy for global campaigns and industry events (trade shows, conferences, webinars), covering messaging, vendor and budget management, and timelines; drove cross-functional alignment with sales and technical stakeholders to translate technical input into compelling messaging and convert event contacts into qualified pipeline.",
         "Developed Excel-based performance dashboards tying campaign and event spend to pipeline contribution, informing reallocation of budget toward higher-yield channels and an increased allocation for the following cycle.",
       ],
       skills: [
@@ -279,6 +279,7 @@ const profile: Profile = {
         "Launched products across North America, Europe, and Asia, taking plans from concept through commercialization, including timelines, deliverables, and stakeholder alignment.",
         "Owned the cooling filter product line supplied into MRI machines, launching a new product, setting pricing and contract terms, and managing the key account relationship with the primary customer in Asia.",
         "Managed portfolio health through lifecycle management, including repositioning and sunsetting decisions on existing products.",
+        "Led market entry and channel expansion into new regional accounts, combining competitive analysis and customer insight to refine pricing and value propositions.",
         "Delivered quarterly performance analysis and strategic recommendations directly to the CEO, including marketing budget allocation across regions and channels.",
       ],
       skills: [
