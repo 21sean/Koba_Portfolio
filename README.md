@@ -6,7 +6,7 @@ Personal website and portfolio, live at **[emikoba.com](https://emikoba.com)**.
 
 ## About
 
-A multilingual marketing portfolio with light and dark themes, project case studies, and downloadable resumes in English, Japanese, and Chinese. Hosted on GitHub Pages with a custom domain.
+A multilingual marketing portfolio with light and dark themes, and project case studies in English, Japanese, and Chinese. Hosted on GitHub Pages with a custom domain.
 
 ## Stack
 

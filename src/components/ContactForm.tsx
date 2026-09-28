@@ -83,7 +83,7 @@ export default function ContactForm() {
 
       {error && (
         <div className="rounded-xl bg-red-50 dark:bg-red-900/20 px-4 py-3 text-sm text-red-600 dark:text-red-400">
-          Something went wrong. Please try again or email directly at emi.kobayashi.work@gmail.com.
+          Something went wrong. Please try again in a moment, or reach out on LinkedIn.
         </div>
       )}
 

@@ -25,7 +25,6 @@ export interface UI {
     contact: string;
   };
   common: {
-    downloadResume: string;
     viewAll: string;
     all: string;
   };
@@ -79,12 +78,11 @@ const uiEn: UI = {
     contact: "Contact",
   },
   common: {
-    downloadResume: "Download Resume",
     viewAll: "View all",
     all: "All",
   },
   home: {
-    viewProjects: "View Resume",
+    viewProjects: "About Me",
     getInTouch: "Get in Touch",
     featuredProjects: "Featured Projects",
     skills: "Skills",
@@ -133,12 +131,11 @@ const uiJa: UI = {
     contact: "お問い合わせ",
   },
   common: {
-    downloadResume: "履歴書をダウンロード",
     viewAll: "すべて表示",
     all: "すべて",
   },
   home: {
-    viewProjects: "履歴書を見る",
+    viewProjects: "私について",
     getInTouch: "お問い合わせ",
     featuredProjects: "注目のプロジェクト",
     skills: "スキル",
@@ -187,12 +184,11 @@ const uiZh: UI = {
     contact: "联系",
   },
   common: {
-    downloadResume: "下载简历",
     viewAll: "查看全部",
     all: "全部",
   },
   home: {
-    viewProjects: "查看简历",
+    viewProjects: "关于我",
     getInTouch: "联系我",
     featuredProjects: "精选项目",
     skills: "技能",
@@ -242,7 +238,6 @@ const profileJa: Profile = {
     "北米、ヨーロッパ、アジアにわたり7年以上B2Bの収益成長を牽引してきた、グローバルマーケティング＆ビジネス戦略のプロフェッショナル。グローバル半導体ポートフォリオの製品ローンチ、ポジショニング、差別化、ライフサイクル管理を担い、3年間で140%の収益成長を達成。MRI装置向けに供給する冷却フィルター製品ラインでは、価格・契約条件・キーアカウント関係まで一貫してオーナーシップを持って推進。コンサルティングでは市場規模推定、競合評価、米国市場参入、ライフサイエンスソフトウェアのクロスマーケット分析を経験。英語・日本語・中国語のトリリンガル。",
   location: "サンディエゴ、CA",
   specialties: ["SaaSマーケティング戦略", "ライフサイエンス＆バイオテック", "AI＆先端製造業"],
-  resumeUrl: "/resume-ja.pdf",
 
   skills: [
     {
@@ -424,7 +419,6 @@ const profileZh: Profile = {
     "拥有7年以上经验的全球营销与商业战略专业人士，在北美、欧洲和亚洲推动B2B收入增长。负责全球半导体产品组合的产品发布、定位、差异化和生命周期管理，在三年内实现140%的收入增长，其中包括供应至MRI设备的冷却过滤器产品线，全面负责定价、合同条款和关键客户关系。咨询经验涵盖市场规模测算、竞争评估、美国市场进入，以及生命科学软件的跨市场分析。精通英语、日语和中文三种语言。",
   location: "圣迭戈，加利福尼亚",
   specialties: ["SaaS营销策略", "生命科学与生物技术", "人工智能与先进制造"],
-  resumeUrl: "/resume-zh.pdf",
 
   skills: [
     {

@@ -72,8 +72,6 @@ export interface Profile {
   location: string;
   specialties: string[];
   socialLinks: SocialLink[];
-  contactEmail: string;
-  resumeUrl: string;
   skills: Skill[];
   certifications: Certification[];
   experience: Experience[];
@@ -96,10 +94,7 @@ const profile: Profile = {
   ],
   socialLinks: [
     { label: "LinkedIn", url: "https://www.linkedin.com/in/emi-kobayashi/", icon: "linkedin" },
-    { label: "Email", url: "mailto:emi.kobayashi.work@gmail.com", icon: "email" },
   ],
-  contactEmail: "emi.kobayashi.work@gmail.com",
-  resumeUrl: "/resume.pdf", // points to static PDF placed in public/resume.pdf
 
   // ── Skills ──────────────────────────────────
   skills: [
