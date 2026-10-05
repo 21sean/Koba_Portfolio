@@ -846,18 +846,22 @@ body > * {
 @layer components {
   /* ── Hanko seal + seigaiha wave texture ─────────────────── */
 
+  /* Name seal: one character per row, the box sized to its characters
+     (so every size scales with font-size). */
   .hanko {
     display: inline-flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 3.25rem;
-    height: 3.25rem;
-    border-radius: 0.5rem;
+    gap: 0.06em;
+    padding: 0.3em 0.24em;
+    border-radius: 0.22em;
     background: var(--color-hanko);
     color: #fff7f2;
-    font-size: 1.7rem;
+    font-size: 1.45rem;
+    font-weight: 600;
     line-height: 1;
-    transform: rotate(-6deg);
+    transform: rotate(-5deg);
     box-shadow:
       inset 0 0 0 2px rgba(255, 247, 242, 0.35),
       inset 0 0 10px rgba(0, 0, 0, 0.18),
@@ -866,11 +870,9 @@ body > * {
 
   /* Small seal for the header logo lockup. */
   .hanko-sm {
-    width: 1.75rem;
-    height: 1.75rem;
-    border-radius: 0.3rem;
-    font-size: 1rem;
-    transform: rotate(-5deg);
+    padding: 0.26em 0.2em;
+    font-size: 0.9375rem;
+    transform: rotate(-4deg);
     box-shadow:
       inset 0 0 0 1.5px rgba(255, 247, 242, 0.32),
       inset 0 0 6px rgba(0, 0, 0, 0.15);

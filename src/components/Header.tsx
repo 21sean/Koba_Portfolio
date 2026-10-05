@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ThemeToggle from "./ThemeToggle";
 import Arrow from "./shared/Arrow";
+import Hanko from "./shared/Hanko";
 import { useLanguage } from "./LanguageProvider";
 import { getUI, getProfile } from "@/lib/translations";
 import { useState, useEffect } from "react";
@@ -54,10 +55,8 @@ export default function Header() {
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
           {/* Logo / Name */}
           <Link href="/" className="group flex items-center gap-3 focus-ring">
-            {/* Seal + name lockup — the same 惠 hanko that signs the home CTA */}
-            <span aria-hidden="true" className="hanko hanko-sm font-mincho">
-              惠
-            </span>
+            {/* Seal + name lockup: 惠美 (Emi), the seal that also signs the home CTA */}
+            <Hanko small />
             <span className="font-display text-xl font-semibold transition-colors duration-200 group-hover:text-[var(--color-accent)]">
               {profile.name}
             </span>

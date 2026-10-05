@@ -18,6 +18,7 @@ import Magnetic from "@/components/Magnetic";
 import GlobalImpactMap from "@/components/GlobalImpactMap";
 import Arrow from "@/components/shared/Arrow";
 import Emphasis from "@/components/shared/Emphasis";
+import Hanko from "@/components/shared/Hanko";
 import { useMounted, useReveal } from "@/lib/useReveal";
 
 // Hero headline: single quantifiable sentence with one inline animated number.
@@ -360,11 +361,9 @@ export default function HomeContent() {
               style={{ maskImage: "linear-gradient(to bottom, #000, transparent)", WebkitMaskImage: "linear-gradient(to bottom, #000, transparent)" }}
             />
             <div className="relative">
-              {/* Hanko seal — 惠 */}
+              {/* Name seal — 惠美 (Emi) */}
               <div className="mb-7 flex justify-center">
-                <span className="hanko font-mincho" aria-hidden="true">
-                  惠
-                </span>
+                <Hanko />
               </div>
               <h2 className="font-display text-3xl font-semibold sm:text-4xl">
                 <Emphasis text={ui.home.interestedTitle} />

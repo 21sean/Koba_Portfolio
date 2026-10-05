@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useLanguage } from "@/components/LanguageProvider";
 import { getUI } from "@/lib/translations";
 import Arrow from "@/components/shared/Arrow";
+import Hanko from "@/components/shared/Hanko";
 
 const ReCAPTCHA = dynamic(() => import("react-google-recaptcha"), { ssr: false });
 
@@ -55,10 +56,8 @@ export default function ContactForm() {
   if (submitted) {
     return (
       <div className="animate-scale-in paper flex flex-col items-center p-10 text-center">
-        {/* Hanko seal — 謝 ("thanks") */}
-        <span className="hanko font-mincho" aria-hidden="true">
-          謝
-        </span>
+        {/* Seal — 感謝 ("gratitude") */}
+        <Hanko text="感謝" />
         <p className="font-display mt-6 text-2xl font-semibold">{ui.contact.thankYou}</p>
         <p className="mt-2 text-sm text-[var(--color-muted)]">
           Your message has been sent successfully.
