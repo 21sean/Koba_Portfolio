@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import CountUp from "@/components/CountUp";
 import { useLanguage } from "@/components/LanguageProvider";
+import Emphasis, { plain } from "@/components/shared/Emphasis";
 
 /**
  * Global Impact — a dotted world map showing where Emi's marketing work has
@@ -127,7 +128,7 @@ const COPY: Record<Lang, ImpactCopy> = {
   en: {
     kicker: "Global Impact",
     kickerJp: "世界での実績",
-    title: "Marketing without borders.",
+    title: "Marketing *without* borders.",
     subtitle:
       "Campaigns planned in Tokyo, localized for Shanghai, scaled across Europe, and led today from San Diego.",
     hint: "Hover a marker to see the market",
@@ -253,13 +254,15 @@ export default function GlobalImpactMap() {
 
       const startPulses = () => {
         pulses.forEach((pulse, i) => {
-          gsap.set(pulse, { opacity: 0.9 });
           gsap.to(pulse, {
             motionPath: { path: arcs[i], align: arcs[i], alignOrigin: [0.5, 0.5] },
             duration: 4.5 + i * 1.2,
             repeat: -1,
             ease: "none",
             delay: i * 1.1,
+            // Reveal only once it's on its arc; during the stagger delay it
+            // would otherwise sit visible at the SVG origin.
+            onStart: () => gsap.set(pulse, { opacity: 0.9 }),
           });
         });
       };
@@ -299,12 +302,12 @@ export default function GlobalImpactMap() {
       <div
         aria-hidden="true"
         className="seigaiha pointer-events-none absolute inset-x-0 bottom-0 h-56 opacity-[0.07] dark:opacity-[0.12]"
-        style={{ maskImage: "linear-gradient(to top, #000, transparent)", WebkitMaskImage: "linear-gradient(to top, #000, transparent)" }}
+        style={{ maskImage: "linear-gradient(to top, transparent, #000 35%, transparent)", WebkitMaskImage: "linear-gradient(to top, transparent, #000 35%, transparent)" }}
       />
       {/* Vertical kanji watermark */}
       <div
         aria-hidden="true"
-        className="vertical-rl font-display pointer-events-none absolute right-3 top-10 select-none text-7xl font-bold text-[var(--color-foreground)] opacity-[0.045] sm:right-8 sm:text-8xl"
+        className="vertical-rl font-mincho pointer-events-none absolute right-3 top-10 select-none text-7xl font-bold text-[var(--color-foreground)] opacity-[0.045] sm:right-8 sm:text-8xl"
       >
         世界へ
       </div>
@@ -312,22 +315,19 @@ export default function GlobalImpactMap() {
       <div className="relative z-10 mx-auto max-w-5xl px-6">
         {/* Heading */}
         <div className="mb-10 max-w-2xl" data-map-reveal>
-          <p className="mb-3 flex items-center gap-2.5 text-sm font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]">
-            {/* Hinomaru dot */}
-            <span aria-hidden="true" className="inline-block h-2.5 w-2.5 rounded-full bg-[var(--color-hanko)]" />
+          <p className="kicker mb-4">
             {copy.kicker}
-            <span className="font-normal normal-case tracking-widest text-[var(--color-muted)]">
+            <span className="font-mincho tracking-[0.2em] text-[var(--color-muted)]/80">
               {copy.kickerJp}
             </span>
           </p>
-          <h2 className="font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl">
-            {copy.title}
+          <h2 className="font-display text-4xl font-semibold leading-[1.08] sm:text-5xl md:text-[3.5rem]">
+            <Emphasis text={copy.title} />
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-[var(--color-muted)] sm:text-lg">
+          <p className="mt-5 text-base leading-relaxed text-[var(--color-muted)] sm:text-lg">
             {copy.subtitle}
           </p>
-          <p className="mt-4 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]">
-            <span aria-hidden="true" className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--color-accent)]" />
+          <p className="font-display mt-4 text-sm italic text-[var(--color-muted)]">
             {copy.hint}
           </p>
         </div>
@@ -338,7 +338,7 @@ export default function GlobalImpactMap() {
             viewBox={`0 0 ${MAP_W} ${MAP_H}`}
             className="h-auto w-full"
             role="img"
-            aria-label={copy.title}
+            aria-label={plain(copy.title)}
           >
             <defs>
               <linearGradient id="impact-arc-grad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -416,24 +416,27 @@ export default function GlobalImpactMap() {
           })}
         </div>
 
-        {/* Stats — compact row */}
-        <div className="mx-auto mt-10 grid max-w-2xl grid-cols-3 gap-2.5 sm:gap-3" data-map-reveal>
+        {/* Stats — a ruled figures row, like a table in a printed report */}
+        <dl
+          className="mx-auto mt-12 grid max-w-3xl grid-cols-3 divide-x divide-[var(--color-border)] border-y border-[var(--color-border)]"
+          data-map-reveal
+        >
           {copy.stats.map((stat) => (
-            <div key={stat.label} className="glass-card glass-card-hover px-3 py-4 text-center">
-              <div className="font-display text-2xl font-bold tabular-nums text-[var(--color-accent)] sm:text-3xl">
+            <div key={stat.label} className="flex flex-col-reverse gap-2 px-3 py-5 text-center sm:px-6 sm:py-6">
+              <dt className="text-xs leading-snug text-[var(--color-muted)] sm:text-[0.8125rem]">
+                {stat.label}
+              </dt>
+              <dd className="font-display text-3xl font-semibold tabular-nums text-[var(--color-foreground)] sm:text-[2.75rem] sm:leading-none">
                 <CountUp
                   end={stat.value}
                   prefix={stat.prefix ?? ""}
                   suffix={stat.suffix ?? ""}
                   durationMs={1600}
                 />
-              </div>
-              <div className="mt-1.5 text-[0.68rem] font-medium leading-snug text-[var(--color-muted)] sm:text-xs">
-                {stat.label}
-              </div>
+              </dd>
             </div>
           ))}
-        </div>
+        </dl>
       </div>
     </section>
   );

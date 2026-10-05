@@ -13,6 +13,7 @@ import EducationCard from "@/components/shared/EducationCard";
 import ExperienceCard from "@/components/shared/ExperienceCard";
 import PageBackdrop from "@/components/PageBackdrop";
 import CustomCursor from "@/components/CustomCursor";
+import Arrow from "@/components/shared/Arrow";
 
 export default function ResumeContent() {
   const { lang } = useLanguage();
@@ -75,31 +76,23 @@ export default function ResumeContent() {
       />
       <div className="relative z-10 mx-auto max-w-3xl px-6 print:max-w-none print:px-8">
         {/* ── Header ────────────────────────────── */}
-        <header className="mb-10 pb-8">
+        <header className="clear-fuji mb-12 pb-2">
           <div className="min-w-0">
-            <h1 className="text-3xl font-extrabold tracking-tight">
+            <p className="kicker mb-4">{profile.location}</p>
+            <h1 className="font-display text-[2.5rem] font-semibold leading-[1.05] sm:text-5xl lg:text-[3.5rem]">
               {profile.name}
             </h1>
-            <p className="mt-2 text-[var(--color-muted)]">
+            <p className="font-display halo mt-3 text-xl italic text-[var(--color-muted)] lg:text-2xl">
               {profile.headline}
-            </p>
-            <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[var(--color-muted)]">
-              <span className="flex items-center gap-1">
-                <svg className="h-3.5 w-3.5 text-[var(--color-accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                {profile.location}
-              </span>
             </p>
           </div>
         </header>
 
         {/* ── Summary ───────────────────────────── */}
         <div id="resume-summary" className="mb-10 scroll-mt-20">
-          <SectionHeading className="mb-3">{ui.resume.summary}</SectionHeading>
-          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-sm print:border-0 print:bg-transparent print:p-0 print:shadow-none">
-            <p className="text-sm leading-relaxed text-[var(--color-foreground)]">
+          <SectionHeading>{ui.resume.summary}</SectionHeading>
+          <div className="paper p-6 print:border-0 print:p-0">
+            <p className="max-w-[65ch] text-[1.0625rem] leading-[1.75] text-[var(--color-foreground)]">
               {profile.summary}
             </p>
           </div>
@@ -112,19 +105,14 @@ export default function ResumeContent() {
           className={`mb-10 scroll-mt-20 reveal ${langRef.revealed ? "revealed" : ""}`}
         >
           <SectionHeading>{ui.resume.languages}</SectionHeading>
-          <div className="flex flex-wrap gap-3">
+          <dl className="grid grid-cols-2 gap-x-6 sm:grid-cols-4">
             {profile.languages.map((lng) => (
-              <div
-                key={lng.name}
-                className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-2.5 text-xs shadow-sm print:border-0 print:p-0 print:shadow-none"
-              >
-                <span className="font-bold">{lng.name}</span>{" "}
-                <span className="text-[var(--color-muted)]">
-                  · {lng.proficiency}
-                </span>
+              <div key={lng.name} className="border-t border-[var(--color-border)] pt-3 pb-1">
+                <dt className="font-display text-[1.0625rem] font-semibold leading-snug">{lng.name}</dt>
+                <dd className="mt-0.5 text-[0.8125rem] text-[var(--color-muted)]">{lng.proficiency}</dd>
               </div>
             ))}
-          </div>
+          </dl>
         </div>
 
         {/* ── Experience ─────────────────────────── */}
@@ -162,9 +150,9 @@ export default function ResumeContent() {
           className={`mb-10 scroll-mt-20 reveal ${certsRef.revealed ? "revealed" : ""}`}
         >
           <SectionHeading>{ui.resume.certifications}</SectionHeading>
-          <div className="grid gap-3">
-            {profile.certifications.map((cert, i) => (
-              <CertificationCard key={cert.name} cert={cert} index={i} />
+          <div className="paper rule-list px-5 print:border-0 print:px-0">
+            {profile.certifications.map((cert) => (
+              <CertificationCard key={cert.name} cert={cert} />
             ))}
           </div>
         </div>
@@ -176,7 +164,7 @@ export default function ResumeContent() {
           className={`mb-10 scroll-mt-20 reveal ${projRef.revealed ? "revealed" : ""}`}
         >
           <div className="mb-4 flex items-end justify-between gap-4">
-            <SectionHeading className="mb-0">{ui.home.featuredProjects}</SectionHeading>
+            <SectionHeading className="mb-0 flex-1">{ui.home.featuredProjects}</SectionHeading>
             <div className="flex items-center gap-3 print:hidden">
               <div className="hidden gap-2 sm:flex">
                 <button
@@ -184,10 +172,10 @@ export default function ResumeContent() {
                   onClick={() => scrollCarousel("left")}
                   disabled={!canScrollLeft}
                   aria-label="Previous projects"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-foreground)] shadow-sm transition-all duration-200 hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-accent-light)] hover:text-[var(--color-accent)] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-[var(--color-border)] disabled:hover:bg-[var(--color-card)] disabled:hover:text-[var(--color-foreground)] disabled:hover:shadow-sm focus-ring"
+                  className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-foreground)] transition-colors duration-200 hover:border-[var(--color-foreground)]/40 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-[var(--color-border)] focus-ring"
                 >
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
+                    <path strokeLinecap="square" d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
                 <button
@@ -195,21 +183,19 @@ export default function ResumeContent() {
                   onClick={() => scrollCarousel("right")}
                   disabled={!canScrollRight}
                   aria-label="Next projects"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-foreground)] shadow-sm transition-all duration-200 hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-accent-light)] hover:text-[var(--color-accent)] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-[var(--color-border)] disabled:hover:bg-[var(--color-card)] disabled:hover:text-[var(--color-foreground)] disabled:hover:shadow-sm focus-ring"
+                  className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-foreground)] transition-colors duration-200 hover:border-[var(--color-foreground)]/40 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-[var(--color-border)] focus-ring"
                 >
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
+                    <path strokeLinecap="square" d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
               </div>
               <Link
                 href="/projects"
-                className="group flex items-center gap-1 text-sm font-medium text-[var(--color-accent)] transition-colors hover:text-[var(--color-accent-hover)] focus-ring"
+                className="link-arrow text-sm text-[var(--color-accent)] transition-colors hover:text-[var(--color-accent-hover)] focus-ring"
               >
                 {ui.common.viewAll}
-                <svg className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
+                <Arrow />
               </Link>
             </div>
           </div>
@@ -243,10 +229,10 @@ export default function ResumeContent() {
             {profile.skills.map((group) => (
               <div
                 key={group.category}
-                className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 text-xs shadow-sm print:border-0 print:p-0 print:shadow-none"
+                className="paper p-4 print:border-0 print:p-0"
               >
-                <span className="font-bold text-[var(--color-accent)]">{group.category}</span>
-                <p className="mt-1 text-[var(--color-muted)]">
+                <h3 className="font-display text-[1.0625rem] font-semibold leading-snug">{group.category}</h3>
+                <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-[var(--color-muted)]">
                   {group.items.join(" · ")}
                 </p>
               </div>

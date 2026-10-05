@@ -33,7 +33,7 @@ const iconMap: Record<string, IconType> = {
 };
 
 // Per-card sticky-top stagger so cards pile up showing each title row.
-const STACK_OFFSET = 52;
+const STACK_OFFSET = 60;
 const HEADER_CLEAR = 80;
 
 export default function Skills() {
@@ -46,10 +46,10 @@ export default function Skills() {
   );
 
   return (
-    <section id="skills" className="w-full px-4 sm:px-6 pt-12 pb-4 sm:pt-20 sm:pb-6">
-      <div className="mx-auto max-w-5xl">
-        <div className="mb-10 text-center">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight tracking-tight">
+    <section id="skills" className="w-full pt-12 pb-4 sm:pt-20 sm:pb-6">
+      <div className="mx-auto max-w-5xl px-6">
+        <div className="mb-10">
+          <h2 className="font-display text-4xl font-semibold leading-[1.08] sm:text-5xl md:text-[3.5rem]">
             {ui.home.skills}
           </h2>
         </div>
@@ -64,18 +64,18 @@ export default function Skills() {
               className="skills-card skills-card-sticky mb-6 w-full"
               style={{ top: `${HEADER_CLEAR + i * STACK_OFFSET}px` }}
             >
-              <div className="skills-card-title">{cat.category}</div>
-              <div className="flex flex-wrap gap-2.5">
+              <h3 className="skills-card-title font-display">{cat.category}</h3>
+              <ul className="skills-list">
                 {cat.items.map((tag) => {
                   const Icon = iconMap[tag];
                   return (
-                    <span key={tag} className="skills-tag">
-                      {Icon && <Icon />}
+                    <li key={tag} className="skills-item">
+                      {Icon && <Icon aria-hidden="true" />}
                       {tag}
-                    </span>
+                    </li>
                   );
                 })}
-              </div>
+              </ul>
             </div>
           ))}
           {/* Runway so the last card has room to stay stuck for a beat

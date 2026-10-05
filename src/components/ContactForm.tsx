@@ -4,6 +4,7 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import { useLanguage } from "@/components/LanguageProvider";
 import { getUI } from "@/lib/translations";
+import Arrow from "@/components/shared/Arrow";
 
 const ReCAPTCHA = dynamic(() => import("react-google-recaptcha"), { ssr: false });
 
@@ -53,19 +54,18 @@ export default function ContactForm() {
 
   if (submitted) {
     return (
-      <div className="animate-scale-in flex flex-col items-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-10 text-center shadow-sm">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-green-100 dark:bg-green-900/30">
-          <svg className="h-7 w-7 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
-        </div>
-        <p className="mt-4 text-lg font-bold">{ui.contact.thankYou}</p>
+      <div className="animate-scale-in paper flex flex-col items-center p-10 text-center">
+        {/* Hanko seal — 謝 ("thanks") */}
+        <span className="hanko font-mincho" aria-hidden="true">
+          謝
+        </span>
+        <p className="font-display mt-6 text-2xl font-semibold">{ui.contact.thankYou}</p>
         <p className="mt-2 text-sm text-[var(--color-muted)]">
           Your message has been sent successfully.
         </p>
         <button
           onClick={() => setSubmitted(false)}
-          className="mt-6 rounded-lg bg-[var(--color-accent-light)] px-5 py-2 text-sm font-medium text-[var(--color-accent)] transition-colors hover:bg-[var(--color-accent)] hover:text-white focus-ring"
+          className="btn btn-outline mt-6 focus-ring"
         >
           {ui.contact.sendAnother}
         </button>
@@ -82,7 +82,7 @@ export default function ContactForm() {
       <input type="hidden" name="_subject" value="New message from emikoba.com" />
 
       {error && (
-        <div className="rounded-xl bg-red-50 dark:bg-red-900/20 px-4 py-3 text-sm text-red-600 dark:text-red-400">
+        <div className="rounded-[var(--radius-lg)] border border-[var(--color-shu)]/40 bg-[var(--color-shu)]/[0.06] px-4 py-3 text-sm text-[var(--color-shu)]">
           Something went wrong. Please try again in a moment, or reach out on LinkedIn.
         </div>
       )}
@@ -100,7 +100,7 @@ export default function ContactForm() {
           type="text"
           required
           minLength={2}
-          className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-background)] px-4 py-3 text-sm outline-none transition-all duration-200 placeholder:text-[var(--color-muted)]/60 focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 focus:shadow-lg focus:shadow-[var(--color-accent)]/5"
+          className="w-full rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-3 text-[0.9375rem] outline-none transition-colors duration-200 placeholder:text-[var(--color-muted)]/70 focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]"
           placeholder={ui.contact.namePlaceholder}
         />
       </div>
@@ -119,7 +119,7 @@ export default function ContactForm() {
           required
           pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"
           title="Please enter a valid email address"
-          className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-background)] px-4 py-3 text-sm outline-none transition-all duration-200 placeholder:text-[var(--color-muted)]/60 focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 focus:shadow-lg focus:shadow-[var(--color-accent)]/5"
+          className="w-full rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-3 text-[0.9375rem] outline-none transition-colors duration-200 placeholder:text-[var(--color-muted)]/70 focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]"
           placeholder={ui.contact.emailPlaceholder}
         />
       </div>
@@ -139,10 +139,10 @@ export default function ContactForm() {
           minLength={10}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          className={`w-full resize-none rounded-xl border bg-[var(--color-background)] px-4 py-3 text-sm outline-none transition-all duration-200 placeholder:text-[var(--color-muted)]/60 focus:ring-2 focus:shadow-lg focus:shadow-[var(--color-accent)]/5 ${overLimit ? "border-red-400 focus:border-red-400 focus:ring-red-400/20" : "border-[var(--color-border)] focus:border-[var(--color-accent)] focus:ring-[var(--color-accent)]/20"}`}
+          className={`w-full resize-none rounded-[var(--radius-lg)] border bg-[var(--color-card)] px-4 py-3 text-[0.9375rem] outline-none transition-colors duration-200 placeholder:text-[var(--color-muted)]/70 focus:ring-1 ${overLimit ? "border-[var(--color-shu)] focus:border-[var(--color-shu)] focus:ring-[var(--color-shu)]" : "border-[var(--color-border)] focus:border-[var(--color-accent)] focus:ring-[var(--color-accent)]"}`}
           placeholder={ui.contact.messagePlaceholder}
         />
-        <div className={`mt-1.5 text-right text-xs ${overLimit ? "text-red-500 font-medium" : "text-[var(--color-muted)]"}`}>
+        <div className={`mt-1.5 text-right text-xs tabular-nums ${overLimit ? "text-[var(--color-shu)] font-medium" : "text-[var(--color-muted)]"}`}>
           {wordCount} / 200 words
         </div>
       </div>
@@ -159,12 +159,10 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={sending || !captchaToken || overLimit}
-        className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-accent)] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[var(--color-accent)]/25 transition-all duration-200 hover:shadow-xl hover:shadow-[var(--color-accent)]/30 hover:-translate-y-0.5 focus-ring disabled:opacity-60 disabled:pointer-events-none"
+        className="btn btn-primary w-full py-4 focus-ring disabled:pointer-events-none disabled:opacity-50"
       >
-        {sending ? "Sending..." : ui.contact.sendMessage}
-        <svg className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-        </svg>
+        {sending ? "Sending…" : ui.contact.sendMessage}
+        <Arrow />
       </button>
     </form>
   );

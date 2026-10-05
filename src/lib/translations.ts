@@ -86,7 +86,7 @@ const uiEn: UI = {
     getInTouch: "Get in Touch",
     featuredProjects: "Featured Projects",
     skills: "Skills",
-    interestedTitle: "Interested in working together?",
+    interestedTitle: "Interested in working *together*?",
     interestedDesc:
       "I'm open to marketing strategy engagements, market research collaborations, and strategic growth advisory roles.",
     contactMe: "Contact Me",

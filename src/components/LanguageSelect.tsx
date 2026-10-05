@@ -38,7 +38,7 @@ export default function LanguageSelect() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium text-[var(--color-muted)] transition-all duration-200 hover:bg-[var(--color-accent-light)] hover:text-[var(--color-foreground)] focus-ring"
+        className="flex h-9 items-center gap-1.5 rounded-[var(--radius-md)] px-2.5 text-sm font-medium text-[var(--color-muted)] transition-colors duration-200 hover:bg-[var(--color-accent-light)] hover:text-[var(--color-foreground)] focus-ring"
         aria-label="Select language"
         aria-expanded={open}
         aria-haspopup="listbox"
@@ -61,7 +61,7 @@ export default function LanguageSelect() {
       {/* Dropdown */}
       {open && (
         <div
-          className="dropdown-enter absolute left-0 sm:left-auto sm:right-0 top-full mt-2 min-w-[160px] rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-1.5 shadow-xl shadow-[var(--color-shadow-lg)]"
+          className="dropdown-enter paper absolute left-0 sm:left-auto sm:right-0 top-full mt-2 min-w-[160px] p-1.5 shadow-[0_12px_28px_-16px_var(--color-shadow-lg)]"
           role="listbox"
           aria-label="Language options"
         >
@@ -74,7 +74,7 @@ export default function LanguageSelect() {
                 setLang(l.code as Lang);
                 setOpen(false);
               }}
-              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors duration-150 ${
+              className={`flex w-full items-center gap-3 rounded-[var(--radius-md)] px-3 py-2.5 text-sm transition-colors duration-150 ${
                 lang === l.code
                   ? "bg-[var(--color-accent-light)] text-[var(--color-accent)] font-medium"
                   : "text-[var(--color-muted)] hover:bg-[var(--color-accent-light)]/50 hover:text-[var(--color-foreground)]"

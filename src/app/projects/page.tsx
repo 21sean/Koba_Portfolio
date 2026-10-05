@@ -29,22 +29,19 @@ export default function ProjectsPage() {
       <CustomCursor />
       <PageBackdrop />
       <div className="relative z-10 mx-auto max-w-5xl px-6">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight">{ui.projects.title}</h1>
-          <p className="mt-2 text-[var(--color-muted)]">
+        <div className="clear-fuji">
+          <h1 className="font-display text-[2.5rem] font-semibold leading-[1.05] sm:text-5xl lg:text-[3.5rem]">{ui.projects.title}</h1>
+          <p className="font-display halo mt-3 text-xl italic text-[var(--color-muted)] lg:text-2xl">
             {ui.projects.description}
           </p>
         </div>
 
         {/* Tag filters */}
-        <div className="mt-10 flex flex-wrap gap-2">
+        <div className="mt-10 flex flex-wrap gap-2" role="group" aria-label="Filter projects by tag">
           <button
             onClick={() => setActiveTag(null)}
-            className={`rounded-full border px-4 py-1.5 text-xs font-semibold transition-all duration-200 focus-ring ${
-              activeTag === null
-                ? "border-[var(--color-accent)] bg-[var(--color-accent)] text-white shadow-lg shadow-[var(--color-accent)]/25"
-                : "border-[var(--color-border)] text-[var(--color-muted)] hover:border-[var(--color-accent)]/40 hover:text-[var(--color-foreground)]"
-            }`}
+            aria-pressed={activeTag === null}
+            className="chip focus-ring"
           >
             {ui.common.all}
           </button>
@@ -52,11 +49,8 @@ export default function ProjectsPage() {
             <button
               key={tag}
               onClick={() => setActiveTag(tag === activeTag ? null : tag)}
-              className={`rounded-full border px-4 py-1.5 text-xs font-semibold transition-all duration-200 focus-ring ${
-                activeTag === tag
-                  ? "border-[var(--color-accent)] bg-[var(--color-accent)] text-white shadow-lg shadow-[var(--color-accent)]/25"
-                  : "border-[var(--color-border)] text-[var(--color-muted)] hover:border-[var(--color-accent)]/40 hover:text-[var(--color-foreground)]"
-              }`}
+              aria-pressed={activeTag === tag}
+              className="chip focus-ring"
             >
               {tag}
             </button>
@@ -73,16 +67,9 @@ export default function ProjectsPage() {
         </div>
 
         {filtered.length === 0 && (
-          <div className="mt-16 flex flex-col items-center text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-accent-light)]">
-              <svg className="h-7 w-7 text-[var(--color-accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-              </svg>
-            </div>
-            <p className="mt-4 text-sm font-medium text-[var(--color-muted)]">
-              {ui.projects.noMatch}
-            </p>
-          </div>
+          <p className="font-display mt-16 text-center text-lg italic text-[var(--color-muted)]">
+            {ui.projects.noMatch}
+          </p>
         )}
       </div>
     </section>

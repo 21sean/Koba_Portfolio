@@ -3,6 +3,7 @@
 import { useLanguage } from "@/components/LanguageProvider";
 import { getProfile } from "@/lib/translations";
 import { assetPath } from "@/lib/basePath";
+import Arrow from "@/components/shared/Arrow";
 
 /**
  * Site footer — styled as the deep "ground" the twilight FooterScene fades
@@ -79,20 +80,22 @@ export default function Footer() {
       <div className="relative z-10 mx-auto max-w-5xl px-6 pb-20 pt-14">
         <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
           <div className="text-sm text-[#cbb6dd]">
-            &copy; {new Date().getFullYear()} {profile.name} &middot;{" "}
-            {profile.location}
+            &copy; {new Date().getFullYear()}{" "}
+            <span className="font-display text-base font-semibold text-[#f1e6ee]">{profile.name}</span>{" "}
+            &middot; {profile.location}
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-5">
             {profile.socialLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.url}
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-[#f5cce9]/80 transition-all duration-200 hover:bg-[#f5cce9]/10 hover:text-white focus-ring"
+                className="link-arrow text-sm font-medium text-[#f5cce9]/85 transition-colors duration-200 hover:text-white focus-ring"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {link.label}
+                <span className="link">{link.label}</span>
+                <Arrow diagonal />
               </a>
             ))}
           </div>

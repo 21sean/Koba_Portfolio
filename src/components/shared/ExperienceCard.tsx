@@ -26,43 +26,54 @@ export default function ExperienceCard({
       {/* Left: vertical line + dot + year range */}
       <div className="relative flex flex-col items-center w-4 shrink-0">
         {/* Vertical line */}
-        <div className={`absolute left-1/2 -translate-x-1/2 w-[2px] bg-[var(--color-border)] ${isFirst ? "top-2.5" : "top-0"} ${isLast ? "h-2.5" : "bottom-0"}`} />
+        <div className={`absolute left-1/2 -translate-x-1/2 w-px bg-[var(--color-border)] ${isFirst ? "top-4" : "top-0"} ${isLast ? "h-4" : "bottom-0"}`} />
         {/* Dot */}
-        <div className="relative z-10 mt-3.5 h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--color-accent)] shadow-[0_0_0_3px_var(--color-background)] transition-transform duration-200 group-hover:scale-125" />
+        <div className="relative z-10 mt-[0.85rem] h-2 w-2 shrink-0 rounded-full bg-[var(--color-hanko)] shadow-[0_0_0_4px_var(--color-background)] transition-transform duration-200 group-hover:scale-125" />
       </div>
       {/* Year label */}
-      <div className="flex items-start pt-2 pl-3 pr-2 shrink-0 w-28">
-        <span className="text-[11px] font-semibold uppercase text-[var(--color-accent)] leading-tight whitespace-nowrap">
+      <div className="hidden items-start pt-[0.55rem] pl-3 pr-3 shrink-0 w-[8.25rem] sm:flex">
+        <span className="font-display text-sm font-medium leading-tight whitespace-nowrap tabular-nums text-[var(--color-muted)]">
           {yearLabel}
         </span>
       </div>
       {/* Card content */}
       <div
-        className="flex-1 mb-6 cursor-pointer rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-sm transition-all duration-200 hover:border-[var(--color-accent)]/30 hover:shadow-md"
+        role="button"
+        tabIndex={0}
+        aria-expanded={open}
+        className="paper paper-hover flex-1 mb-5 ml-3 sm:ml-0 cursor-pointer p-4 focus-ring"
         onClick={() => setOpen(!open)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setOpen(!open);
+          }
+        }}
       >
         <div className="flex gap-3">
           {exp.logo && (
             <img
               src={exp.logo}
               alt={exp.company}
-              className="h-9 w-9 shrink-0 rounded-lg object-contain"
+              className="h-9 w-9 shrink-0 rounded-[var(--radius-md)] object-contain"
             />
           )}
           <div className="flex-1 min-w-0">
+            <p className="mb-1 text-xs font-medium tabular-nums text-[var(--color-muted)] sm:hidden">{yearLabel}</p>
             <div className="flex items-center justify-between gap-2">
-              <h3 className="text-sm font-bold">{exp.title}</h3>
+              <h3 className="font-display text-[1.0625rem] font-semibold leading-snug">{exp.title}</h3>
               <svg
                 className={`h-3.5 w-3.5 shrink-0 text-[var(--color-muted)] transition-transform duration-200 ${open ? "rotate-180" : ""}`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
-                strokeWidth={2}
+                strokeWidth={1.5}
+                aria-hidden="true"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </div>
-            <p className="mt-0.5 text-xs text-[var(--color-muted)]">
+            <p className="mt-1 text-[0.8125rem] text-[var(--color-muted)]">
               {exp.company}
               {exp.type ? ` · ${exp.type}` : ""} · {exp.location}
             </p>
@@ -74,9 +85,9 @@ export default function ExperienceCard({
             open ? "mt-3 max-h-[500px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <ul className="list-disc space-y-1 pl-4">
+          <ul className="list-disc space-y-1.5 pl-4 marker:text-[var(--color-hanko)]">
             {exp.bullets.map((b, j) => (
-              <li key={j} className="text-xs leading-relaxed text-[var(--color-muted)]">
+              <li key={j} className="text-[0.8125rem] leading-relaxed text-[var(--color-muted)]">
                 {b}
               </li>
             ))}

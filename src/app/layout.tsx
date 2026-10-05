@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Shippori_Mincho } from "next/font/google";
+import { Platypi, Schibsted_Grotesk, Shippori_Mincho } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import Header from "@/components/Header";
@@ -10,15 +10,32 @@ import { LanguageProvider } from "@/components/LanguageProvider";
 import profile from "@/data/profile";
 import { SITE_URL } from "@/lib/site";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-
-// Japanese serif display face for the home-page redesign. Latin is preloaded;
-// kanji glyphs (惠, 世界…) load on demand via next/font's unicode-range slices.
-const shippori = Shippori_Mincho({
+// English display face: Platypi, a wedge-serif whose sharp, carved-looking
+// serifs echo the woodblock-print artwork. Variable weight, with true italics
+// for emphasis.
+const platypi = Platypi({
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
+  style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
+});
+
+// Text and UI face: a crisp editorial grotesque.
+const schibsted = Schibsted_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+// Japanese mincho, now used only for CJK glyphs: the kanji watermark, 小林惠美,
+// the tategaki column, the hanko seal, and Japanese/Chinese headings via the
+// `.font-display` fallback chain. Nothing Latin renders in it, so nothing is
+// preloaded; kanji load on demand via next/font's unicode-range slices.
+const shippori = Shippori_Mincho({
+  weight: ["500", "600", "700"],
+  variable: "--font-mincho",
+  display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -66,7 +83,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className={`${inter.variable} ${shippori.variable} font-sans antialiased selection:bg-[var(--color-accent)] selection:text-white`}>
+      <body className={`${platypi.variable} ${schibsted.variable} ${shippori.variable} font-sans antialiased`}>
         <ThemeProvider>
           <LanguageProvider>
             <div className="animate-page-in flex min-h-screen flex-col">

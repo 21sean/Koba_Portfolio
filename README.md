@@ -12,6 +12,7 @@ A multilingual marketing portfolio with light and dark themes, and project case 
 
 - Next.js and TypeScript
 - Tailwind CSS
+- Type via `next/font`: Platypi (display) and Schibsted Grotesk (text) for English, Shippori Mincho for Japanese
 - Static export to GitHub Pages
 
 ## Local development

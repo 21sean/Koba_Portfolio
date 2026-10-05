@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ThemeToggle from "./ThemeToggle";
+import Arrow from "./shared/Arrow";
 import { useLanguage } from "./LanguageProvider";
 import { getUI, getProfile } from "@/lib/translations";
 import { useState, useEffect } from "react";
@@ -44,22 +45,22 @@ export default function Header() {
   return (
     <>
       <header
-        className={`no-print sticky top-0 z-50 transition-all duration-300 ${
+        className={`no-print sticky top-0 z-50 border-b transition-colors duration-300 ${
           scrolled
-            ? "border-b border-[var(--color-border)] bg-[var(--color-background)]/80 backdrop-blur-xl shadow-[0_1px_3px_var(--color-shadow)]"
-            : "bg-[var(--color-background)]/60 backdrop-blur-md"
+            ? "border-[var(--color-border)] bg-[var(--color-background)]/90 backdrop-blur-md"
+            : "border-transparent bg-[var(--color-background)]/60 backdrop-blur-md"
         }`}
       >
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
           {/* Logo / Name */}
-          <Link
-            href="/"
-            className="group relative text-lg font-bold tracking-tight"
-          >
-            <span className="relative z-10 transition-colors duration-200 group-hover:text-[var(--color-accent)]">
+          <Link href="/" className="group flex items-center gap-3 focus-ring">
+            {/* Seal + name lockup — the same 惠 hanko that signs the home CTA */}
+            <span aria-hidden="true" className="hanko hanko-sm font-mincho">
+              惠
+            </span>
+            <span className="font-display text-xl font-semibold transition-colors duration-200 group-hover:text-[var(--color-accent)]">
               {profile.name}
             </span>
-            <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 rounded-full bg-[var(--color-accent)] transition-all duration-300 group-hover:w-full" />
           </Link>
 
           {/* Desktop nav */}
@@ -70,10 +71,11 @@ export default function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`hover-underline relative rounded-md px-3 py-2 text-sm font-medium transition-colors duration-200 focus-ring ${
+                  aria-current={isActive ? "page" : undefined}
+                  className={`relative px-3 py-2 text-[0.9375rem] font-medium transition-colors duration-200 focus-ring ${
                     isActive
-                      ? "text-[var(--color-accent)] nav-active"
-                      : "text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-accent-light)]/50"
+                      ? "text-[var(--color-foreground)] nav-active"
+                      : "text-[var(--color-muted)] hover:text-[var(--color-foreground)]"
                   }`}
                 >
                   {item.label}
@@ -88,24 +90,24 @@ export default function Header() {
 
           {/* Mobile hamburger */}
           <button
-            className="relative z-[60] flex h-10 w-10 items-center justify-center rounded-lg text-[var(--color-foreground)] transition-colors hover:bg-[var(--color-accent-light)] focus-ring md:hidden"
+            className="relative z-[60] flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-foreground)] transition-colors hover:bg-[var(--color-accent-light)] focus-ring md:hidden"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
             aria-expanded={menuOpen}
           >
             <div className="flex h-5 w-5 flex-col items-center justify-center">
               <span
-                className={`block h-0.5 w-5 rounded-full bg-current transition-all duration-300 ${
+                className={`block h-0.5 w-5 bg-current transition-all duration-300 ${
                   menuOpen ? "translate-y-[3px] rotate-45" : ""
                 }`}
               />
               <span
-                className={`mt-1 block h-0.5 w-5 rounded-full bg-current transition-all duration-300 ${
+                className={`mt-1 block h-0.5 w-5 bg-current transition-all duration-300 ${
                   menuOpen ? "opacity-0 scale-0" : ""
                 }`}
               />
               <span
-                className={`mt-1 block h-0.5 w-5 rounded-full bg-current transition-all duration-300 ${
+                className={`mt-1 block h-0.5 w-5 bg-current transition-all duration-300 ${
                   menuOpen ? "-translate-y-[9px] -rotate-45" : ""
                 }`}
               />
@@ -133,7 +135,7 @@ export default function Header() {
 
         {/* Content */}
         <div className="relative flex h-full flex-col px-6 pt-24 pb-10">
-          <nav aria-label="Mobile navigation" className="flex flex-col gap-1">
+          <nav aria-label="Mobile navigation" className="flex flex-col">
             {navItems.map((item, i) => {
               const isActive = pathname === item.href;
               return (
@@ -141,10 +143,9 @@ export default function Header() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
-                  className={`group flex items-center justify-between rounded-2xl px-5 py-4 text-2xl font-semibold tracking-tight transition-all duration-300 ${
-                    isActive
-                      ? "bg-[var(--color-accent-light)] text-[var(--color-accent)]"
-                      : "text-[var(--color-foreground)] hover:bg-[var(--color-accent-light)]/40 active:bg-[var(--color-accent-light)]/60"
+                  aria-current={isActive ? "page" : undefined}
+                  className={`group font-display flex items-center justify-between border-b border-[var(--color-border)] px-1 py-5 text-3xl font-semibold transition-all duration-300 first:border-t ${
+                    isActive ? "text-[var(--color-foreground)]" : "text-[var(--color-foreground)]/75 active:text-[var(--color-foreground)]"
                   }`}
                   style={{
                     transitionDelay: menuOpen ? `${80 + i * 60}ms` : "0ms",
@@ -154,19 +155,11 @@ export default function Header() {
                 >
                   <span className="flex items-center gap-3">
                     {isActive && (
-                      <span className="h-2 w-2 rounded-full bg-[var(--color-accent)]" />
+                      <span className="h-2 w-2 rounded-full bg-[var(--color-hanko)]" />
                     )}
                     {item.label}
                   </span>
-                  <svg
-                    className="h-5 w-5 text-[var(--color-muted)] transition-transform duration-200 group-hover:translate-x-1 group-active:translate-x-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
+                  <Arrow className="text-[var(--color-muted)] transition-transform duration-200 group-hover:translate-x-1 group-active:translate-x-1" />
                 </Link>
               );
             })}

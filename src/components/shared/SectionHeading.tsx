@@ -5,15 +5,15 @@ interface SectionHeadingProps {
   className?: string;
 }
 
+// Display-serif heading followed by a hairline rule that runs to the edge.
 export default function SectionHeading({
   children,
   className = "",
 }: SectionHeadingProps) {
   return (
     <h2
-      className={`mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-[0.15em] text-[var(--color-accent)] ${className}`}
+      className={`font-display mb-5 flex items-center gap-4 text-2xl font-semibold after:h-px after:flex-1 after:bg-[var(--color-border)] after:content-[''] ${className}`}
     >
-      <span className="inline-block h-4 w-1 rounded-full bg-[var(--color-accent)]" />
       {children}
     </h2>
   );

@@ -32,7 +32,7 @@ export default function SideNav({ items }: { items: SideNavItem[] }) {
 
   return (
     <nav className="hidden lg:block fixed left-[max(1rem,calc((100vw-48rem)/2-13rem))] top-28 w-44 print:hidden">
-      <ul className="space-y-0.5 border-l-2 border-[var(--color-border)]">
+      <ul className="space-y-0.5 border-l border-[var(--color-border)]">
         {items.map((item) => (
           <li key={item.id}>
             <button
@@ -41,10 +41,10 @@ export default function SideNav({ items }: { items: SideNavItem[] }) {
                   .getElementById(item.id)
                   ?.scrollIntoView({ behavior: "smooth", block: "start" })
               }
-              className={`block w-full pl-3 py-1.5 text-left text-[11px] leading-snug transition-all duration-200 rounded-r-md ${
+              className={`block w-full py-1.5 pl-3.5 text-left text-xs leading-snug transition-colors duration-200 ${
                 activeId === item.id
-                  ? "-ml-[2px] border-l-2 border-[var(--color-accent)] font-semibold text-[var(--color-accent)] bg-[var(--color-accent)]/5"
-                  : "text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-accent)]/5"
+                  ? "-ml-px border-l-[1.5px] border-[var(--color-hanko)] font-semibold text-[var(--color-foreground)]"
+                  : "text-[var(--color-muted)] hover:text-[var(--color-foreground)]"
               }`}
             >
               {item.label}
